@@ -31,7 +31,7 @@
         "test": "phpunit",
         "publish:assets": [
             "mkdir -p www/bootstrap",
-            "cp -R vendor/twbs/bootstrap/dist/ www/bootstrap/"
+            "cp -R vendor/twbs/bootstrap/dist/* www/bootstrap/"
         ]
     }
 }
