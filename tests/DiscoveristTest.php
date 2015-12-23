@@ -11,6 +11,6 @@ class DiscoveristTest extends \PHPUnit_Framework_TestCase
         $app = new App();
         $app->hello();
 
-        $this->expectOutputString("Discoverist. The only place to find Composer virtual packages.");
+        $this->expectOutputString("The only place to find Composer virtual packages.");
     }
 }

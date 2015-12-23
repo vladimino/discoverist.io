@@ -13,6 +13,6 @@ class App
      */
     public function hello()
     {
-        echo "Discoverist. The only place to find Composer virtual packages.";
+        echo "The only place to find Composer virtual packages.";
     }
 }
