@@ -1,0 +1,7 @@
+# routes.yml
+results_index:
+    path:     /
+    defaults: {_controller: 'Vladimino\Discoverist\Controller\ResultsController', action: 'indexAction'}
+f2f_index:
+    path:     /face2face
+    defaults: { _controller: 'Vladimino\Discoverist\Controller\Face2FaceController', action: 'indexAction'}

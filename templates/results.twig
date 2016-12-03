@@ -1,0 +1,83 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-3 col-md-3 sidebar">
+            <ul class="nav nav-sidebar">
+                {% for tour in tours %}
+                    <!--li class="active"><a href="#">Overview</a></li-->
+                    <li {% if tour.id == currentTourId %} class="active"{% endif %}>
+                        <a href="?tournament={{ tour.id }}">{{ tour.name }}</a>
+                        {% if tour.id == currentTourId %}<span class="sr-only">(current)</span>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main">
+            <h1 class="page-header">Результаты турниров ЧГК</h1>
+
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="tourID">Введите ID турнира: </label>
+                    <input type="number" id="tourID" class="form-control" name="tournament" value="{{ currentTourId }}"
+                           placeholder="ID турнира">
+                </div>
+                <input type="submit" class="btn btn-default" title="Результаты по всей Герамнии" name="search" value="Германия">
+                <input type="submit" class="btn btn-primary" title="Результаты только по Берлину" name="search" value="Берлин">
+            </form>
+
+            <hr>
+
+            <h2 class="sub-header">
+                {{ currentTourInfo.name }}
+                <a class="btn btn-info" href="http://rating.chgk.info/tournament/{{ currentTourInfo.idtournament }}"
+                   target="_blank">
+                    <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                    Открыть на сайте рейтинга
+                </a>
+            </h2>
+            <div class="panel panel-info">
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Начало:</strong> {{ currentTourInfo.date_start }}</li>
+                    <li class="list-group-item"><strong>Окончание:</strong> {{ currentTourInfo.date_end }}</li>
+                    <li class="list-group-item"><strong>Всего вопросов:</strong> {{ currentTourInfo.questions_total }}</li>
+                </ul>
+            </div>
+
+            <h2 class="sub-header">Таблица результатов</h2>
+            <div class="table-responsive">
+            {% if results is not empty %}
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                        <th class="text-center">Место</th>
+                        <th>Команда</th>
+                        <th>Город </th>
+                        <th>Взято</th>
+                        <th>Рейтинг</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i,result in results %}
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td class="text-center">{{ result.place }}</td>
+                        <td>{{ result.base_name }}</td>
+                        <td>{{ result.city }}</td>
+                        <td>{{ result.questions_total }}</td>
+                        <td>{{ result.bonus_b }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="bg-danger">Извините, результаты не найдены.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
