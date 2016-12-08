@@ -1,9 +1,50 @@
 {% extends "base.twig" %}
 {% block header %}
-    <h1>Face 2 Face</h1>
-    <h2>Результаты очного противостояния 2-х команд</h2>
+    <h1>Результаты очного противостояния 2-х команд (Face2Face)</h1>
 {% endblock %}
 
 {% block content %}
-    <p>Coming soon</p>
+    <form class="form-inline">
+        <div class="form-group">
+            <label class="sr-only" for="team1ID">1-я команда</label>
+            <select id="team1ID" name="team1ID" class="form-control">
+                {% for id,team in teams %}
+                    <option value="{{ id }}" {% if id == team1id %} selected{% endif %}>{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <p class="form-control-static">vs.</p>
+        <div class="form-group">
+            <label class="sr-only" for="team2ID">2-я команда</label>
+            <select id="team2ID" name="team2ID" class="form-control">
+                {% for id,team in teams %}
+                    <option value="{{ id }}" {% if id == team2id %} selected{% endif %}>{{ team.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Сравнить</button>
+    </form>
+    <hr>
+    <div class="row">
+        <div class="col-sm-4 col-md-4">
+            {{ team1.name }}
+        </div>
+        <div class="col-sm-4 col-md-4">
+            vs.
+        </div>
+        <div class="col-sm-4 col-md-4">
+            {{ team2.name }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-md-4">
+            {{ totals.team1wins }}
+        </div>
+        <div class="col-sm-4 col-md-4">
+            {{ totals.draws }}
+        </div>
+        <div class="col-sm-4 col-md-4">
+            {{ totals.team2wins }}
+        </div>
+    </div>
 {% endblock %}

@@ -26,10 +26,10 @@ class Utils
         foreach ($array as $key => $val) {
             $offset = 0;
             $found  = false;
-            foreach ($tempArray as $tmp_key => $tmp_val) {
-                if (!$found and strtolower($val[$subKey]) > strtolower($tmp_val[$subKey])) {
+            foreach ($tempArray as $tmpKey => $tmpVal) {
+                if (!$found and strtolower($val[$subKey]) > strtolower($tmpVal[$subKey])) {
                     $tempArray = array_merge(
-                        (array)array_slice($tempArray, 0, $offset),
+                        (array) array_slice($tempArray, 0, $offset),
                         [$key => $val],
                         array_slice($tempArray, $offset)
                     );

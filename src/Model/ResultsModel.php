@@ -2,49 +2,23 @@
 
 namespace Vladimino\Discoverist\Model;
 
-use Vladimino\Discoverist\Core\Config;
 use Vladimino\Discoverist\Core\Utils;
-use Vladimino\Discoverist\Rating\Connector;
+use Vladimino\Discoverist\Error\LoadConfigException;
 
 /**
  * Class ResultsModel
  * @package Model
  */
-class ResultsModel
+class ResultsModel extends AbstractRatingAwareModel
 {
     /**
-     * @var Connector
-     */
-    protected $connector;
-    /**
-     * @var array
-     */
-    protected $tours;
-    /**
-     * @var array
-     */
-    protected $teams;
-
-    /**
-     * ResultsModel constructor.
-     *
-     * @param Connector $connector
-     */
-    public function __construct(Connector $connector)
-    {
-        $this->connector = $connector;
-        $this->tours     = array_reverse(Config::get('tours'));
-        $this->teams     = Config::get('teams');
-    }
-
-    /**
      * @return array
-     * @throws \Exception
+     * @throws LoadConfigException
      */
     public function getTours()
     {
         if (empty($this->tours)) {
-            throw new \Exception('Ошибка загрузки конфигурации, список турниров пуст');
+            throw new LoadConfigException('Ошибка загрузки конфигурации, список турниров пуст');
         }
 
         return $this->tours;

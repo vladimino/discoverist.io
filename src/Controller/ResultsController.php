@@ -28,8 +28,8 @@ class ResultsController extends AbstractController
         $model           = new ResultsModel(new Connector());
         $tours           = $model->getTours();
         $currentTourId   = $request->get(self::PARAM_TOUR, $tours[0]['id']);
-        $currentTourInfo = $model->getTourInfo($currentTourId);
         $searchFilter    = $request->get(self::PARAM_SEARCH, self::SEARCH_DEFAULT);
+        $currentTourInfo = $model->getTourInfo($currentTourId);
         $results         = $model->getResultsFromTournament($currentTourId, $searchFilter);
 
         return $this->render(
