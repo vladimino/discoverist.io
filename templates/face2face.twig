@@ -1,6 +1,6 @@
 {% extends "base.twig" %}
 {% block header %}
-    <h1>Результаты очного противостояния 2-х команд (Face2Face)</h1>
+    <h1>Face2Face <small>Результаты очного противостояния 2-х команд</small></h1>
 {% endblock %}
 
 {% block content %}
@@ -25,26 +25,38 @@
         <button type="submit" class="btn btn-primary">Сравнить</button>
     </form>
     <hr>
-    <div class="row">
-        <div class="col-sm-4 col-md-4">
-            {{ team1.name }}
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">{{ team1.name }} vs. {{ team2.name }}</div>
+        <div class="panel-body">
+            <div class="progress">
+                <div class="progress-bar  progress-bar-success"  style="width: {{ totals.team1wins / 0.01 / totals.games }}%;">
+                    {{ totals.team1wins }}
+                </div>
+                <div class="progress-bar  progress-bar-warning"  style="width: {{ totals.draws / 0.01 / totals.games }}%;">
+                    {{ totals.draws }}
+                </div>
+                <div class="progress-bar  progress-bar-danger"  style="width: {{ totals.team2wins / 0.01 / totals.games }}%;">
+                    {{ totals.team2wins }}
+                </div>
+            </div>
         </div>
-        <div class="col-sm-4 col-md-4">
-            vs.
-        </div>
-        <div class="col-sm-4 col-md-4">
-            {{ team2.name }}
-        </div>
+
+        {% if fac2face %}
+        <!-- List group -->
+        <ul class="list-group" style="width:40%">
+            {% for tourResult in fac2face %}
+            <a href="http://rating.chgk.info/tournament/{{ tourResult.tour_id }}"
+               class="list-group-item  {% if tourResult.result == 'team1win' %}list-group-item-success{% elseif tourResult.result == 'team2win' %}list-group-item-danger{% else %}list-group-item-warning{% endif %}"
+            >
+                <h4 class="list-group-item-heading">{{ tourResult.tour_name }}</h4>
+                <p class="list-group-item-text">{{ tourResult.team1points }} : {{ tourResult.team2points }}</p>
+            </a>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <div class="alert alert-danger" role="alert">Увы, результатов не найдено.</div>
+        {% endif %}
     </div>
-    <div class="row">
-        <div class="col-sm-4 col-md-4">
-            {{ totals.team1wins }}
-        </div>
-        <div class="col-sm-4 col-md-4">
-            {{ totals.draws }}
-        </div>
-        <div class="col-sm-4 col-md-4">
-            {{ totals.team2wins }}
-        </div>
-    </div>
+
 {% endblock %}
