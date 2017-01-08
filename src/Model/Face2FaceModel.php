@@ -33,7 +33,7 @@ class Face2FaceModel extends AbstractRatingAwareModel
             throw new LoadConfigException('Ошибка загрузки конфигурации, список турниров пуст');
         }
 
-        $face2face       = [];
+        $face2face = [];
 
         foreach ($this->tours as $tour) {
             $f2fResults = $this->getFace2FaceResultsForTour($team1ID, $team2ID, $tour);

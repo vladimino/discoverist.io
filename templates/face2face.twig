@@ -39,67 +39,72 @@
         <button type="submit" class="btn btn-primary">Сравнить</button>
     </form>
     <hr>
-    <div class="panel panel-default f2f-panel">
-        <!-- Default panel contents -->
-        <div class="panel-heading">"{{ team1.name }}" vs. "{{ team2.name }}"</div>
-        <div class="panel-body">
-            <h3>Соотношение побед и поражений</h3>
-            <div class="progress">
-                <div class="progress-bar  progress-bar-success"
-                     style="width: {{ totals.team1wins / 0.01 / totals.games }}%;">
-                    {{ totals.team1wins }}
+
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+    {% else %}
+        <div class="panel panel-default f2f-panel">
+            <!-- Default panel contents -->
+            <div class="panel-heading">"{{ team1.name }}" vs. "{{ team2.name }}"</div>
+            <div class="panel-body">
+                {% if fac2face %}
+                <h3>Соотношение побед и поражений</h3>
+                <div class="progress">
+                    <div class="progress-bar  progress-bar-success"
+                         style="width: {{ totals.team1wins / 0.01 / totals.games }}%;">
+                        {{ totals.team1wins }}
+                    </div>
+                    <div class="progress-bar  progress-bar-warning"
+                         style="width: {{ totals.draws / 0.01 / totals.games }}%;">
+                        {{ totals.draws }}
+                    </div>
+                    <div class="progress-bar  progress-bar-danger"
+                         style="width: {{ totals.team2wins / 0.01 / totals.games }}%;">
+                        {{ totals.team2wins }}
+                    </div>
                 </div>
-                <div class="progress-bar  progress-bar-warning"
-                     style="width: {{ totals.draws / 0.01 / totals.games }}%;">
-                    {{ totals.draws }}
-                </div>
-                <div class="progress-bar  progress-bar-danger"
-                     style="width: {{ totals.team2wins / 0.01 / totals.games }}%;">
-                    {{ totals.team2wins }}
-                </div>
-            </div>
-            {% if fac2face %}
-            <h3>Результаты по турам</h3>
-            <table class="f2ftable table table-hover">
-                {% set total1 = 0 %}
-                {% set total2 = 0 %}
-                <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Турнир</th>
-                    <th>Счет</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for i,tourResult in fac2face %}
-                    <tr class="{% if tourResult.result == 'team1win' %}success{% elseif tourResult.result == 'team2win' %}danger{% else %}warning{% endif %}">
-                        <td>
-                            {{ i+1 }}
-                        </td>
-                        <td>
-                            <a href="http://rating.chgk.info/tournament/{{ tourResult.tour_id }}" target="_blank">
-                                {{ tourResult.tour_name }}
-                            </a>
-                        </td>
-                        <td class="f2f-row-scores">
-                            {{ tourResult.team1points }} : {{ tourResult.team2points }}
+                <h3>Результаты по турам</h3>
+                <table class="f2ftable table table-hover">
+                    {% set total1 = 0 %}
+                    {% set total2 = 0 %}
+                    <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Турнир</th>
+                        <th>Счет</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i,tourResult in fac2face %}
+                        <tr class="{% if tourResult.result == 'team1win' %}success{% elseif tourResult.result == 'team2win' %}danger{% else %}warning{% endif %}">
+                            <td>
+                                {{ i+1 }}
+                            </td>
+                            <td>
+                                <a href="http://rating.chgk.info/tournament/{{ tourResult.tour_id }}" target="_blank">
+                                    {{ tourResult.tour_name }}
+                                </a>
+                            </td>
+                            <td class="f2f-row-scores">
+                                {{ tourResult.team1points }} : {{ tourResult.team2points }}
+                            </td>
+                        </tr>
+                        {% set total1 = total1 + tourResult.team1points %}
+                        {% set total2 = total2 + tourResult.team2points %}
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr class="{% if total1 > total2 %}success{% elseif total1 < total2 %}danger{% else %}warning{% endif %}">
+                        <td colspan="3" class="text-right">
+                            <strong>{{ total1 }} : {{ total2 }}</strong>
                         </td>
                     </tr>
-                    {% set total1 = total1 + tourResult.team1points %}
-                    {% set total2 = total2 + tourResult.team2points %}
-                {% endfor %}
-                </tbody>
-                <tfoot>
-                <tr class="{% if total1 > total2 %}success{% elseif total1 < total2 %}danger{% else %}warning{% endif %}">
-                    <td colspan="3" class="text-right">
-                        <strong>{{ total1 }} : {{ total2 }}</strong>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">Увы, противостояний не найдено.</div>
+            {% endif %}
         </div>
-        {% else %}
-            <div class="alert alert-danger" role="alert">Увы, результатов не найдено.</div>
-        {% endif %}
-    </div>
+    {% endif %}
 {% endblock %}

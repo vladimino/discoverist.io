@@ -36,7 +36,7 @@ class Face2FaceController extends AbstractController
             $face2faceResults = $model->getFace2FaceResults($team1ID, $team2ID);
         } catch (SameTeamException $e) {
             $face2faceResults = [];
-            $errorMessage     = 'Как ты можешь бежать от самого себя? Куда бы ты ни пришёл, ты будешь с самим собой.';
+            $errorMessage     = $e->getMessage();
         }
 
         return $this->render(
