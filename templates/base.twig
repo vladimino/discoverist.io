@@ -13,7 +13,7 @@
 
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/dashboard.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -23,6 +23,7 @@
 </head>
 <body>
 
+<!-- Fixed navbar -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -33,12 +34,15 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" title="Скрипты ЧГК от Владимира Белокура">Скрипты ЧГК от Владимира Белокура</a>
+            <a class="navbar-brand" href="/" title="Скрипты ЧГК от Владимира Белокура">
+                Скрипты ЧГК от Владимира Белокура
+            </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="/">Результаты турниров</a></li>
-                <li><a href="/face2face">Очные противостояния</a></li>
+                <li{% if section == "results" %} class="active"{% endif %}><a href="/">Результаты турниров</a></li>
+                <li{% if section == "f2f" %} class="active"{% endif %}><a href="/face2face">Очные противостояния</a>
+                </li>
             </ul>
         </div><!--/.navbar-collapse -->
     </div>
@@ -50,7 +54,7 @@
 </div> <!-- /container -->
 {% block javascripts %}
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
 {% endblock %}
 </body>
 </html>

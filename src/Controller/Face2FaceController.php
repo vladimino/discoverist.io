@@ -49,7 +49,8 @@ class Face2FaceController extends AbstractController
                 'team2'         => $model->getTeamById($team2ID),
                 'error_message' => $errorMessage,
                 'fac2face'      => $face2faceResults,
-                'totals'      => $model->getTotals(),
+                'totals'        => $model->getTotals(),
+                'section'       => 'f2f',
             ]
         );
     }

@@ -39,6 +39,7 @@ class ResultsController extends AbstractController
                 'currentTourId'   => $currentTourId,
                 'currentTourInfo' => $currentTourInfo,
                 'results'         => $results,
+                'section'         => 'results',
             ]
         );
     }
