@@ -1,19 +1,6 @@
 Discoverist.io
 ================
-Composer virtual package listing.
-
-#### Installation via Composer
-``` bash
-$ composer require vladimino/discoverist.io
-```
-
-#### Changelog
-Please see [CHANGELOG](CHANGELOG.md) for more information.
-
-#### Running Tests
-``` bash
-$ composer test
-```
+Scripts for rating.chgk.info and db.chgk.info.
 
 #### Contributing
 Please see [CONTRIBUTING](CONTRIBUTING.md) for more details.
