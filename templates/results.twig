@@ -25,17 +25,18 @@
                         <h1 class="page-header">Результаты турниров ЧГК</h1>
                         <form class="form-inline">
                             <div class="form-group">
-                                <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Выберите из списка</a> или
+                                <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Выберите из списка</a>
+                                или
                                 <label for="tourID">введите ID турнира: </label>
                                 <input type="number" id="tourID" class="form-control" name="tournament"
                                        value="{{ currentTourId }}"
                                        placeholder="ID турнира">
                             </div>
                             <input type="submit" class="btn btn-default" title="Результаты по всей Герамнии"
-                                   name="search"
+                                   name="country"
                                    value="Германия">
                             <input type="submit" class="btn btn-primary" title="Результаты только по Берлину"
-                                   name="search"
+                                   name="town"
                                    value="Берлин">
                         </form>
 
@@ -80,7 +81,7 @@
                                     <tr>
                                         <td class="text-center">{{ result.place }}</td>
                                         <td>{{ result.base_name }}</td>
-                                        <td>{{ result.city }}</td>
+                                        <td>{{ result.town }}</td>
                                         <td>{{ result.questions_total }}</td>
                                         <td>{{ result.bonus_b }}</td>
                                     </tr>

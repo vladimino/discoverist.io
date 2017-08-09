@@ -2,7 +2,6 @@
 
 namespace Vladimino\Discoverist\View;
 
-use Twig_Autoloader;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
@@ -23,10 +22,8 @@ class TwigTemplate implements TemplateInterface
      *
      * @return void
      */
-    public function init(array $params)
+    public function init(array $params): void
     {
-        Twig_Autoloader::register();
-
         $loader = new Twig_Loader_Filesystem($params['views_path']);
 
         $this->twig = new Twig_Environment(
@@ -47,12 +44,15 @@ class TwigTemplate implements TemplateInterface
 
     /**
      * @param string $template
-     * @param array  $data
+     * @param array $data
      *
      * @return string
+     * @throws \Twig_Error_Syntax
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Loader
      */
-    public function render($template, $data = [])
+    public function render(string $template, ?array $data): string
     {
-        return $this->twig->render($template.self::TEMPLATE_EXTENSION, $data);
+        return $this->twig->render($template . self::TEMPLATE_EXTENSION, $data ?? []);
     }
 }

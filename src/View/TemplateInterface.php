@@ -12,14 +12,13 @@ interface TemplateInterface
      *
      * @return void
      */
-    public function init(array $params);
+    public function init(array $params): void;
 
     /**
      * @param string $template
-     * @param array  $data
+     * @param array $data
      *
-     * @return mixed
+     * @return string
      */
-    public function render($template, $data = []);
-
+    public function render(string $template, ?array $data): string;
 }

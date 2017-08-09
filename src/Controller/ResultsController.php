@@ -5,41 +5,48 @@ namespace Vladimino\Discoverist\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Vladimino\Discoverist\Model\ResultsModel;
-use Vladimino\Discoverist\Rating\Connector;
 
 /**
  * Class ResultsController
+ *
  * @package Vladimino\Discoverist\Controller
  */
 class ResultsController extends AbstractController
 {
-    const PARAM_TOUR = 'tournament';
-    const PARAM_SEARCH = 'search';
-
-    const SEARCH_DEFAULT = 'Германия';
+    const PARAM_TOUR    = 'tournament';
+    const PARAM_COUNTRY = 'country';
+    const PARAM_TOWN    = 'town';
 
     /**
-     * @param Request $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     * @throws \Vladimino\Discoverist\Error\LoadConfigException
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request): Response
     {
-        $model           = new ResultsModel(new Connector());
-        $tours           = $model->getTours();
-        $currentTourId   = $request->get(self::PARAM_TOUR, $tours[0]['id']);
-        $searchFilter    = $request->get(self::PARAM_SEARCH, self::SEARCH_DEFAULT);
+        /** @var ResultsModel $model */
+        $model = $this->container['model.results'];
+        $tours = $model->getTours();
+
+        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['id']);
+        $countryFilter = $request->get(self::PARAM_COUNTRY, ResultsModel::SEARCH_VALUE_GERMANY);
+        $townFilter    = $request->get(self::PARAM_TOWN, '');
+
         $currentTourInfo = $model->getTourInfo($currentTourId);
-        $results         = $model->getResultsFromTournament($currentTourId, $searchFilter);
+        $results         = $model->getRealTimeResultsFromTournament($currentTourId, $countryFilter, $townFilter);
 
         return $this->render(
             'results',
             [
-                'tours'           => $tours,
-                'currentTourId'   => $currentTourId,
+                'tours' => $tours,
+                'currentTourId' => $currentTourId,
                 'currentTourInfo' => $currentTourInfo,
-                'results'         => $results,
-                'section'         => 'results',
+                'results' => $results,
+                'section' => self::SECTION_RESULTS,
             ]
         );
     }

@@ -7,7 +7,9 @@ namespace Vladimino\Discoverist\Core;
  */
 class Config
 {
+    /** @todo yaml */
     const CONFIG_EXTENSION = '.php';
+
     /** @var array */
     public static $configRegistry = [];
 
@@ -16,11 +18,13 @@ class Config
      *
      * @return array
      */
-    public static function get($configName)
+    public static function get(string $configName): array
     {
-        $configName = strtolower($configName);
+        $configName = \strtolower($configName);
 
-        self::$configRegistry[$configName] = require CONFIG_DIR.$configName.self::CONFIG_EXTENSION;
+        /** @todo use proper config load */
+        /** @noinspection PhpIncludeInspection */
+        self::$configRegistry[$configName] = require \CONFIG_DIR . $configName . self::CONFIG_EXTENSION;
 
         return self::$configRegistry[$configName];
     }

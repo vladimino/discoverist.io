@@ -2,6 +2,7 @@
 
 namespace Vladimino\Discoverist;
 
+use Pimple\Container;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,16 +13,59 @@ use Symfony\Component\Routing\RequestContext;
 
 /**
  * Class App
+ *
  * @package Vladimino\Discoverist
  */
 class App
 {
     /**
-     * Runs an engine
+     * @var \Pimple\Container
      */
-    public function run()
+    private $container;
+
+    /**
+     * App constructor.
+     *
+     * @param \Pimple\Container $container
+     */
+    public function __construct(Container $container)
     {
-        $locator = new FileLocator(CONFIG_DIR);
+        $this->container = $container;
+    }
+
+    /**
+     * Runs an engine
+     *
+     * @throws \InvalidArgumentException When the HTTP status code is not valid
+     */
+    public function run(): void
+    {
+        try {
+            $response = $this->retrieveResponse();
+        } catch (ResourceNotFoundException $exception) {
+            $response = new Response(
+                'Not Found',
+                Response::HTTP_NOT_FOUND
+            );
+        } catch (\Exception $exception) {
+            $response = new Response(
+                'An error occurred: ' . $exception->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        $response->send();
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @throws \Symfony\Component\Routing\Exception\MethodNotAllowedException
+     */
+    private function retrieveResponse(): Response
+    {
+        $locator = new FileLocator(\CONFIG_DIR);
         $loader  = new YamlFileLoader($locator);
         $routes  = $loader->load('routes.yml');
 
@@ -29,19 +73,11 @@ class App
         $context = new RequestContext();
         $context->fromRequest($request);
         $matcher = new UrlMatcher($routes, $context);
+        $request->attributes->add($matcher->match($request->getPathInfo()));
+        $controller       = $request->attributes->get('_controller');
+        $action           = $request->attributes->get('action');
+        $controllerObject = new $controller($this->container);
 
-        try {
-            $request->attributes->add($matcher->match($request->getPathInfo()));
-            $controller       = $request->attributes->get('_controller');
-            $action           = $request->attributes->get('action');
-            $controllerObject = new $controller();
-            $response         = $controllerObject->$action($request);
-        } catch (ResourceNotFoundException $e) {
-            $response = new Response('Not Found', 404);
-        } catch (\Exception $e) {
-            $response = new Response('An error occurred: '.$e->getMessage(), 500);
-        }
-
-        $response->send();
+        return $controllerObject->$action($request);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'type'   => 'twig',
+    'type' => 'twig',
     'params' => [
-        'views_path'    => realpath('../templates'),
-        'compiled_path' => realpath('../cache/twig'),
-        'debug'         => true,
+        'views_path' => __DIR__ . '/../templates',
+        'compiled_path' => __DIR__ . '/../cache/twig',
+        'debug' => true,
     ],
 ];

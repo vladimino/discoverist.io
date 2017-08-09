@@ -7,77 +7,60 @@ use Vladimino\Discoverist\Error\SameTeamException;
 
 /**
  * Class Face2FaceModel
+ *
  * @package Model
  */
 class Face2FaceModel extends AbstractRatingAwareModel
 {
     protected $team1Wins = 0;
     protected $team2Wins = 0;
-    protected $draws = 0;
+    protected $draws     = 0;
+
+    const RESULT_TEAM_1_WIN = 'team1win';
+    const RESULT_TEAM_2_WIN = 'team2win';
+    const RESULT_DRAW       = 'draw';
 
     /**
      * @param int $team1ID
      * @param int $team2ID
      *
      * @return array
+     * @throws \Exception
      * @throws SameTeamException
      * @throws LoadConfigException
      */
-    public function getFace2FaceResults($team1ID, $team2ID)
+    public function getResultsForTeams(int $team1ID, int $team2ID): array
     {
-        if ($team1ID == $team2ID) {
-            throw new SameTeamException();
-        }
+        $this->validateInput($team1ID, $team2ID);
 
-        if (empty($this->tours)) {
-            throw new LoadConfigException('Ошибка загрузки конфигурации, список турниров пуст');
-        }
-
-        $face2face = [];
-
-        foreach ($this->tours as $tour) {
-            $f2fResults = $this->getFace2FaceResultsForTour($team1ID, $team2ID, $tour);
-
-            if (count($f2fResults) !== 2) {
-                continue;
+        $results = [];
+        foreach ($this->allTours as $tour) {
+            $resultForTour = $this->getTourResults($team1ID, $team2ID, $tour);
+            if (null !== $resultForTour) {
+                $results[] = $resultForTour;
             }
-
-            $f2fTeam1Result = $this->filterResultsByTeam($f2fResults, $team1ID);
-            $f2fTeam2Result = $this->filterResultsByTeam($f2fResults, $team2ID);
-
-            if (empty($f2fTeam1Result['questions_total']) || empty($f2fTeam1Result['questions_total'])) {
-                continue;
-            }
-
-            $face2face[] = [
-                'result'      => $this->processResultForTour($f2fTeam1Result, $f2fTeam2Result),
-                'tour_id'     => $tour['id'],
-                'tour_name'   => $tour['name'],
-                'team1points' => $f2fTeam1Result['questions_total'],
-                'team2points' => $f2fTeam2Result['questions_total'],
-            ];
         }
 
-        return $face2face;
+        return $results;
     }
 
     /**
      * @return array
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return [
-            'games'     => $this->getTotalGamesCount(),
+            'games' => $this->getTotalGamesCount(),
             'team1wins' => $this->team1Wins,
             'team2wins' => $this->team2Wins,
-            'draws'     => $this->draws,
+            'draws' => $this->draws,
         ];
     }
 
     /**
      * @return int
      */
-    private function getTotalGamesCount()
+    private function getTotalGamesCount(): int
     {
         return $this->team1Wins + $this->draws + $this->team2Wins;
     }
@@ -85,62 +68,120 @@ class Face2FaceModel extends AbstractRatingAwareModel
     /**
      * @param int $team1ID
      * @param int $team2ID
-     * @param int $tour
+     * @param array $tour
      *
      * @return array
+     * @throws \Exception
      */
-    private function getFace2FaceResultsForTour($team1ID, $team2ID, $tour)
+    public function getTourResults(int $team1ID, int $team2ID, array $tour): ?array
     {
-        $results    = $this->connector->getTourResults($tour['id']);
-        $f2fResults = array_filter(
-            $results,
-            function ($result) use ($team1ID, $team2ID) {
-                return ($result['idteam'] == $team1ID || $result['idteam'] == $team2ID);
-            }
-        );
+        $results         = $this->connector->getTourResults($tour['id']);
+        $filteredResults = $this->filterResults($results, $team1ID, $team2ID);
 
-        return $f2fResults;
-    }
-
-    /**
-     * @param array $f2fTeam1Result
-     * @param array $f2fTeam2Result
-     *
-     * @return string
-     */
-    private function processResultForTour($f2fTeam1Result, $f2fTeam2Result)
-    {
-        if ($f2fTeam1Result['questions_total'] > $f2fTeam2Result['questions_total']) {
-            $this->team1Wins++;
-            $result = 'team1win';
-        } elseif ($f2fTeam2Result['questions_total'] > $f2fTeam1Result['questions_total']) {
-            $this->team2Wins++;
-            $result = 'team2win';
-        } else {
-            $this->draws++;
-            $result = 'draw';
+        if (\count($filteredResults) !== 2) {
+            return null;
         }
 
-        return $result;
+        $team1Result = $this->filterResultsByTeam($filteredResults, $team1ID);
+        $team2Result = $this->filterResultsByTeam($filteredResults, $team2ID);
+
+        if (!isset(
+            $team1Result[AbstractRatingAwareModel::KEY_POINTS],
+            $team2Result[AbstractRatingAwareModel::KEY_POINTS]
+        )
+        ) {
+            return null;
+        }
+
+        return [
+            'result' => $this->processResultForTour($team1Result, $team2Result),
+            'tour_id' => $tour['id'],
+            'tour_name' => $tour['name'],
+            'team1points' => $team1Result[AbstractRatingAwareModel::KEY_POINTS],
+            'team2points' => $team2Result[AbstractRatingAwareModel::KEY_POINTS],
+        ];
     }
 
     /**
      * @param array $results
-     * @param int   $teamID
+     * @param int $team1ID
+     * @param int $team2ID
      *
-     * @return mixed
+     * @return array
      */
-    private function filterResultsByTeam($results, $teamID)
+    private function filterResults(array $results, int $team1ID, int $team2ID): array
     {
-        $f2fTeam1Result = array_pop(
-            array_filter(
-                $results,
-                function ($result) use ($teamID) {
-                    return $result['idteam'] == $teamID;
-                }
-            )
+        return \array_filter(
+            $results,
+            function ($result) use ($team1ID, $team2ID) {
+                return ((int)$result['idteam'] === $team1ID
+                    || (int)$result['idteam'] === $team2ID
+                );
+            }
+        );
+    }
+
+    /**
+     * @param array $team1Result
+     * @param array $team2Result
+     *
+     * @return string
+     */
+    private function processResultForTour(array $team1Result, array $team2Result): string
+    {
+        $team1Points = $team1Result[AbstractRatingAwareModel::KEY_POINTS];
+        $team2Points = $team2Result[AbstractRatingAwareModel::KEY_POINTS];
+
+        if ($team1Points > $team2Points) {
+            $this->team1Wins++;
+
+            return self::RESULT_TEAM_1_WIN;
+        }
+
+        if ($team2Points > $team1Points) {
+            $this->team2Wins++;
+
+            return self::RESULT_TEAM_2_WIN;
+        }
+
+        $this->draws++;
+
+        return self::RESULT_DRAW;
+    }
+
+    /**
+     * @param array $results
+     * @param int $teamID
+     *
+     * @return array
+     */
+    private function filterResultsByTeam(array $results, int $teamID): array
+    {
+        $filteredResults = \array_filter(
+            $results,
+            function ($result) use ($teamID) {
+                return (int)$result['idteam'] === $teamID;
+            }
         );
 
-        return $f2fTeam1Result;
+        return \array_pop($filteredResults);
+    }
+
+    /**
+     * @param int $team1ID
+     * @param int $team2ID
+     *
+     * @throws \Vladimino\Discoverist\Error\LoadConfigException
+     * @throws \Vladimino\Discoverist\Error\SameTeamException
+     */
+    private function validateInput(int $team1ID, int $team2ID): void
+    {
+        if ($team1ID === $team2ID) {
+            throw new SameTeamException();
+        }
+
+        if (empty($this->allTours)) {
+            throw new LoadConfigException();
+        }
     }
 }
