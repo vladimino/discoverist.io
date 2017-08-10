@@ -7,10 +7,9 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 {% for tour in tours %}
-                    <!--li class="active"><a href="#">Overview</a></li-->
-                    <li {% if tour.id == currentTourId %} class="active"{% endif %}>
-                        <a href="?tournament={{ tour.id }}">{{ tour.name }}</a>
-                        {% if tour.id == currentTourId %}<span class="sr-only">(current)</span>{% endif %}
+                    <li {% if tour.idtournament == currentTourId %} class="active"{% endif %}>
+                        <a href="?tournament={{ tour.idtournament }}">{{ tour.name }}</a>
+                        {% if tour.idtournament == currentTourId %}<span class="sr-only">(current)</span>{% endif %}
                     </li>
                 {% endfor %}
             </ul>

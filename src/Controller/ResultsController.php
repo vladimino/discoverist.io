@@ -21,6 +21,7 @@ class ResultsController extends AbstractController
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \RuntimeException
      * @throws \Exception
      * @throws \Vladimino\Discoverist\Error\LoadConfigException
      * @throws \UnexpectedValueException
@@ -30,14 +31,14 @@ class ResultsController extends AbstractController
     {
         /** @var ResultsModel $model */
         $model = $this->container['model.results'];
-        $tours = $model->getTours();
+        $tours = $model->getRealTimeTours();
 
-        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['id']);
-        $countryFilter = $request->get(self::PARAM_COUNTRY, ResultsModel::SEARCH_VALUE_GERMANY);
+        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['idtournament']);
+        $countryFilter = $request->get(self::PARAM_COUNTRY, ResultsModel::COUNTRY_GERMANY);
         $townFilter    = $request->get(self::PARAM_TOWN, '');
 
         $currentTourInfo = $model->getTourInfo($currentTourId);
-        $results         = $model->getRealTimeResultsFromTournament($currentTourId, $countryFilter, $townFilter);
+        $results         = $model->getFilteredResultsFromTournament($currentTourId, $countryFilter, $townFilter);
 
         return $this->render(
             'results',

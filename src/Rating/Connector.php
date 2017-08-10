@@ -16,6 +16,7 @@ class Connector
 
     const API_SUFFIX_LIST   = '/list';
     const API_SUFFIX_SEARCH = 'search';
+    const API_SUFFIX_TOURS  = '/tournaments';
 
     const API_PARAM_TOWN = 'town';
 
@@ -49,7 +50,7 @@ class Connector
      */
     public function getTourInfo($tourId): array
     {
-        $url            = self::API_ENDPOINT_TOURNAMENTS . $tourId . self::API_FORMAT;
+        $url            = self::API_ENDPOINT_TOURNAMENTS . $tourId .  self::API_FORMAT;
         $tournamentInfo = $this->makeRequest($url);
 
         if (!isset($tournamentInfo[0])) {
@@ -102,10 +103,23 @@ class Connector
     }
 
     /**
+     * @param int $teamId
+     *
+     * @return array
+     * @throws \RuntimeException
+     */
+    public function getToursByTeam(int $teamId): array
+    {
+        $seasonId = '/last';
+        $url = self::API_ENDPOINT_TEAMS . $teamId . self::API_SUFFIX_TOURS . $seasonId . self::API_FORMAT;
+
+        return $this->makeRequest($url);
+    }
+
+    /**
      * @param string $town
      *
      * @return array
-     * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */

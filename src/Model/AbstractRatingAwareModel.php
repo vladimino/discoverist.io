@@ -18,6 +18,7 @@ class AbstractRatingAwareModel
     const KEY_POINTS  = 'questions_total';
     const KEY_TEAM_ID = 'idteam';
     const KEY_TOWN    = 'town';
+    const KEY_TOURS   = 'tournaments';
 
     /**
      * @var Connector

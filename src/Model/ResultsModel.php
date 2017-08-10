@@ -11,7 +11,9 @@ use Vladimino\Discoverist\Rating\Connector;
  */
 class ResultsModel extends AbstractRatingAwareModel
 {
-    const SEARCH_VALUE_GERMANY      = 'Германия';
+    const COUNTRY_GERMANY = 'Германия';
+
+    const TOWN_BERLIN = 'Берлин';
 
     /**
      * @var \Illuminate\Support\Collection
@@ -36,11 +38,10 @@ class ResultsModel extends AbstractRatingAwareModel
      * @param string $townFilter
      *
      * @return array
-     * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    public function getRealTimeResultsFromTournament(
+    public function getFilteredResultsFromTournament(
         int $tournamentID,
         string $countryFilter,
         string $townFilter
@@ -60,11 +61,30 @@ class ResultsModel extends AbstractRatingAwareModel
      * @param int $tournamentId
      *
      * @return array
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function getTourInfo(int $tournamentId): array
     {
         return $this->connector->getTourInfo($tournamentId);
+    }
+
+    /**
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     */
+    public function getRealTimeTours(): array
+    {
+        $towns   = [self::TOWN_BERLIN];
+        $teams   = $this->geAllTeamsForTowns($towns);
+        $tourIds = $this->getPlayedTournamentsByTeams($teams);
+
+        $tours = [];
+        foreach ($tourIds as $tourId) {
+            $tours[] = $this->connector->getTourInfo($tourId);
+        }
+
+        return $this->orderToursByDate($tours);
     }
 
     /**
@@ -145,6 +165,20 @@ class ResultsModel extends AbstractRatingAwareModel
     }
 
     /**
+     * @param array $tours
+     *
+     * @return array
+     */
+    private function orderToursByDate(array $tours): array
+    {
+        $toursCollection = \collect($tours);
+
+        return $toursCollection
+            ->sortByDesc('date_start')
+            ->toArray();
+    }
+
+    /**
      * @param string $country
      *
      * @return array
@@ -161,7 +195,6 @@ class ResultsModel extends AbstractRatingAwareModel
      * @return array
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Exception
      */
     private function geAllTeamsForTowns(array $towns): array
     {
@@ -197,5 +230,25 @@ class ResultsModel extends AbstractRatingAwareModel
     private function populateTournamentResults(int $tournamentID): void
     {
         $this->tourResults = \collect($this->connector->getTourResults($tournamentID));
+    }
+
+    /**
+     * @param array $teams
+     *
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function getPlayedTournamentsByTeams(array $teams): array
+    {
+        $tourIds = [];
+        foreach ($teams as $team) {
+            $teamWithTours = $this->connector->getToursByTeam($team[self::KEY_TEAM_ID]);
+            if ($teamWithTours[self::KEY_TOURS]) {
+                $tourIds = \array_merge($tourIds, $teamWithTours[self::KEY_TOURS]);
+            }
+        }
+
+
+        return \array_unique($tourIds);
     }
 }
