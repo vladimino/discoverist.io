@@ -76,14 +76,16 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for i,result in results %}
-                                    <tr>
-                                        <td class="text-center">{{ result.place }}</td>
-                                        <td>{{ result.base_name }}</td>
-                                        <td>{{ result.town }}</td>
-                                        <td>{{ result.questions_total }}</td>
-                                        <td>{{ result.bonus_b }}</td>
-                                    </tr>
+                                {% for result in results %}
+                                    {% if result.place %}
+                                        <tr>
+                                            <td class="text-center">{{ result.place }}</td>
+                                            <td>{{ result.base_name }}</td>
+                                            <td>{{ result.town }}</td>
+                                            <td>{{ result.questions_total }}</td>
+                                            <td>{{ result.bonus_b }}</td>
+                                        </tr>
+                                    {% endif %}
                                 {% endfor %}
                                 </tbody>
                             </table>

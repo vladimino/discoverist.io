@@ -73,11 +73,16 @@ class ResultsModel extends AbstractRatingAwareModel
      */
     public function getPlayedToursForTown(string $town): array
     {
-        $teams   = $this->geAllTeamsForTowns([$town]);
-        $tourIds = $this->getPlayedTournamentsIDsByTeams($teams);
-        $tours   = $this->getToursInfoByTourIds($tourIds);
+        $teams        = $this->geAllTeamsForTowns([$town]);
+        $tourIds      = $this->getPlayedTournamentsIDsByTeams($teams);
+        $tours        = $this->getToursInfoByTourIds($tourIds);
+        $orderedTours = $this->orderToursByDate($tours);
 
-        return $this->orderToursByDate($tours);
+        while (\strtotime($orderedTours[0]['date_end']) > \time()) {
+            \array_shift($orderedTours);
+        }
+
+        return $orderedTours;
     }
 
     /**

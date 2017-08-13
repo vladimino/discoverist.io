@@ -85,7 +85,7 @@ class AbstractRatingAwareModel
     {
         $teams = [];
         foreach ($towns as $town) {
-            $teams = \array_merge($teams, $this->connector->searchTeamsByTown($town));
+            $teams = \array_merge($teams, $this->getTeamsForTown($town));
         }
 
         return $teams;
@@ -149,5 +149,21 @@ class AbstractRatingAwareModel
         }
 
         return $tours;
+    }
+
+    /**
+     * @param string $town
+     *
+     * @return array
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    protected function getTeamsForTown(string $town): array
+    {
+        $teams = \collect($this->connector->searchTeamsByTown($town));
+
+        return $teams
+            ->sortBy(Connector::KEY_NAME)
+            ->toArray();
     }
 }

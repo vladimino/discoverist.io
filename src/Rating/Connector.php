@@ -34,19 +34,28 @@ class Connector
     private const AGENT         = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
     private const COOKIE        = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
 
+    private const CACHE_EXPIRATION = 86400; // 60 sec * 60 min * 24 h = 24 hours
+
     /**
      * @var \Vladimino\Discoverist\Rating\Geo
      */
     private $geoClient;
 
     /**
+     * @var \Memcached
+     */
+    private $cache;
+
+    /**
      * Connector constructor.
      *
      * @param \Vladimino\Discoverist\Rating\Geo $geoClient
+     * @param \Memcached $cache
      */
-    public function __construct(Geo $geoClient)
+    public function __construct(Geo $geoClient, \Memcached $cache)
     {
         $this->geoClient = $geoClient;
+        $this->cache = $cache;
     }
 
     /**
@@ -177,8 +186,13 @@ class Connector
      */
     public function makeRequest(string $url, bool $convertJSON = true)
     {
-        $resource = \curl_init($url);
+        // Try to get results from cache first
+        $cachedResult = $this->cache->get($url);
+        if ($cachedResult) {
+            return $cachedResult;
+        }
 
+        $resource = \curl_init($url);
         \curl_setopt_array(
             $resource,
             [
@@ -206,6 +220,9 @@ class Connector
         if (null === $results) {
             throw new \RuntimeException('Ошибка конвертации результата от API рейтинга. Url: ' . $url);
         }
+
+        // Cache result
+        $this->cache->set($url, $results, self::CACHE_EXPIRATION);
 
         return $results;
     }
