@@ -13,27 +13,25 @@ use Vladimino\Discoverist\Model\ResultsModel;
  */
 class ResultsController extends AbstractController
 {
-    const PARAM_TOUR    = 'tournament';
-    const PARAM_COUNTRY = 'country';
-    const PARAM_TOWN    = 'town';
+    const PARAM_TOUR         = 'tournament';
+    const PARAM_DEFAULT_TOWN = 'defaultTown';
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \RuntimeException
-     * @throws \Exception
-     * @throws \Vladimino\Discoverist\Error\LoadConfigException
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      */
     public function indexAction(Request $request): Response
     {
+        $defaultTown = $request->get(self::PARAM_DEFAULT_TOWN, ResultsModel::TOWN_BERLIN);
         /** @var ResultsModel $model */
-        $model = $this->container['model.results'];
-        $tours = $model->getRealTimeTours();
+        $model       = $this->container['model.results'];
+        $tours       = $model->getPlayedToursForTown($defaultTown);
 
-        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['idtournament']);
+        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['idtournament'] ?? 0);
         $countryFilter = $request->get(self::PARAM_COUNTRY, ResultsModel::COUNTRY_GERMANY);
         $townFilter    = $request->get(self::PARAM_TOWN, '');
 

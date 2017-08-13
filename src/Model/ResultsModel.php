@@ -11,10 +11,6 @@ use Vladimino\Discoverist\Rating\Connector;
  */
 class ResultsModel extends AbstractRatingAwareModel
 {
-    const COUNTRY_GERMANY = 'Германия';
-
-    const TOWN_BERLIN = 'Берлин';
-
     /**
      * @var \Illuminate\Support\Collection
      */
@@ -69,20 +65,17 @@ class ResultsModel extends AbstractRatingAwareModel
     }
 
     /**
+     * @param string $town
+     *
      * @return array
-     * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
-    public function getRealTimeTours(): array
+    public function getPlayedToursForTown(string $town): array
     {
-        $towns   = [self::TOWN_BERLIN];
-        $teams   = $this->geAllTeamsForTowns($towns);
-        $tourIds = $this->getPlayedTournamentsByTeams($teams);
-
-        $tours = [];
-        foreach ($tourIds as $tourId) {
-            $tours[] = $this->connector->getTourInfo($tourId);
-        }
+        $teams   = $this->geAllTeamsForTowns([$town]);
+        $tourIds = $this->getPlayedTournamentsIDsByTeams($teams);
+        $tours   = $this->getToursInfoByTourIds($tourIds);
 
         return $this->orderToursByDate($tours);
     }
@@ -94,7 +87,7 @@ class ResultsModel extends AbstractRatingAwareModel
      */
     private function applyFilterToResults(array $teams) : void
     {
-        $teamIds           = \array_column($teams, self::KEY_TEAM_ID);
+        $teamIds           = \array_column($teams, Connector::KEY_TEAM_ID);
         $this->tourResults = $this->tourResults->filter(
             function ($result) use ($teamIds) {
                 return \in_array($result['idteam'], $teamIds);
@@ -117,7 +110,7 @@ class ResultsModel extends AbstractRatingAwareModel
         $teams2TownsMap      = $this->buildTeams2TownsMap($teams);
 
         foreach ($results as $key => $result) {
-            $currentPoints     = $result[self::KEY_POINTS];
+            $currentPoints     = $result[Connector::KEY_POINTS];
             $uniquePointsCount = $points2ValuesMap[$currentPoints];
 
             if ($uniquePointsCount > 1                    // non-unique
@@ -134,8 +127,8 @@ class ResultsModel extends AbstractRatingAwareModel
                 $displayPlace = $highestPlaceInRange;
             }
 
-            $results[$key][self::KEY_PLACE] = $displayPlace;
-            $results[$key][self::KEY_TOWN]  = $teams2TownsMap[$result[self::KEY_TEAM_ID]];
+            $results[$key][Connector::KEY_PLACE] = $displayPlace;
+            $results[$key][Connector::KEY_TOWN]  = $teams2TownsMap[$result[Connector::KEY_TEAM_ID]];
 
             if ($uniquePointsCount === 1) {
                 $highestPlaceInRange++;
@@ -150,7 +143,7 @@ class ResultsModel extends AbstractRatingAwareModel
      */
     private function buildPoints2ValuesMap(): array
     {
-        $points = \array_column($this->tourResults->toArray(), self::KEY_POINTS);
+        $points = \array_column($this->tourResults->toArray(), Connector::KEY_POINTS);
 
         return \array_count_values($points);
     }
@@ -161,49 +154,7 @@ class ResultsModel extends AbstractRatingAwareModel
     private function orderResultsByPoints(): void
     {
         $this->tourResults = $this->tourResults
-            ->sortByDesc(self::KEY_POINTS);
-    }
-
-    /**
-     * @param array $tours
-     *
-     * @return array
-     */
-    private function orderToursByDate(array $tours): array
-    {
-        $toursCollection = \collect($tours);
-
-        return $toursCollection
-            ->sortByDesc('date_start')
-            ->toArray();
-    }
-
-    /**
-     * @param string $country
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
-    private function getTownsByCountry(string $country): array
-    {
-        return $this->connector->getTownsByCountry($country);
-    }
-
-    /**
-     * @param array $towns
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     */
-    private function geAllTeamsForTowns(array $towns): array
-    {
-        $teams = [];
-        foreach ($towns as $town) {
-            $teams = \array_merge($teams, $this->connector->searchTeamsByTown($town));
-        }
-
-        return $teams;
+            ->sortByDesc(Connector::KEY_POINTS);
     }
 
     /**
@@ -215,7 +166,7 @@ class ResultsModel extends AbstractRatingAwareModel
     {
         $townsMap = [];
         foreach ($teams as $team) {
-            $townsMap[$team[self::KEY_TEAM_ID]] = $team[self::KEY_TOWN];
+            $townsMap[$team[Connector::KEY_TEAM_ID]] = $team[Connector::KEY_TOWN];
         }
 
         return $townsMap;
@@ -230,25 +181,5 @@ class ResultsModel extends AbstractRatingAwareModel
     private function populateTournamentResults(int $tournamentID): void
     {
         $this->tourResults = \collect($this->connector->getTourResults($tournamentID));
-    }
-
-    /**
-     * @param array $teams
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
-    private function getPlayedTournamentsByTeams(array $teams): array
-    {
-        $tourIds = [];
-        foreach ($teams as $team) {
-            $teamWithTours = $this->connector->getToursByTeam($team[self::KEY_TEAM_ID]);
-            if ($teamWithTours[self::KEY_TOURS]) {
-                $tourIds = \array_merge($tourIds, $teamWithTours[self::KEY_TOURS]);
-            }
-        }
-
-
-        return \array_unique($tourIds);
     }
 }

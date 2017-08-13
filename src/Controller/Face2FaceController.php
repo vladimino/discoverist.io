@@ -18,19 +18,12 @@ class Face2FaceController extends AbstractController
     const PARAM_CUSTOM_TEAM1_ID = 'team1IDcustom';
     const PARAM_CUSTOM_TEAM2_ID = 'team2IDcustom';
 
-    const DEFAULT_TEAM1_ID = 3476; // Псевдопептиды
-    const DEFAULT_TEAM2_ID = 4649; // Берлитанты
-
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \RuntimeException
-     * @throws \Exception
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Vladimino\Discoverist\Error\TeamNotFoundException
-     * @throws \Vladimino\Discoverist\Error\LoadConfigException
      */
     public function indexAction(Request $request): Response
     {
@@ -39,14 +32,17 @@ class Face2FaceController extends AbstractController
         $errorMessage  = '';
         $customTeam1ID = $request->get(self::PARAM_CUSTOM_TEAM1_ID);
         $customTeam2ID = $request->get(self::PARAM_CUSTOM_TEAM2_ID);
-        $team1ID       = $customTeam1ID ?: (int)$request->get(self::PARAM_TEAM1_ID, self::DEFAULT_TEAM1_ID);
-        $team2ID       = $customTeam2ID ?: (int)$request->get(self::PARAM_TEAM2_ID, self::DEFAULT_TEAM2_ID);
+        $countryFilter = $request->get(self::PARAM_COUNTRY, Face2FaceModel::COUNTRY_GERMANY);
+        $townFilter    = $request->get(self::PARAM_TOWN, '');
+
+        $team1ID       = $customTeam1ID ?: (int)$request->get(self::PARAM_TEAM1_ID, Face2FaceModel::DEFAULT_TEAM1_ID);
+        $team2ID       = $customTeam2ID ?: (int)$request->get(self::PARAM_TEAM2_ID, Face2FaceModel::DEFAULT_TEAM2_ID);
 
         try {
             $team1    = $model->getTeamById($team1ID);
             $team2    = $model->getTeamById($team2ID);
             $results  = $model->getResultsForTeams($team1ID, $team2ID);
-            $allTeams = $model->getAllTeams();
+            $allTeams = $model->getFilteredTeams($countryFilter, $townFilter);
         } catch (\Exception $exception) {
             $results      = [];
             $errorMessage = $exception->getMessage();

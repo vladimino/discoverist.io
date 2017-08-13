@@ -15,13 +15,13 @@
                     <select id="team1ID" name="team1ID" class="form-control" onfocus="$('#team1IDcustom').val('')">
                         <option value="">--Выберите команду Германии--</option>
                         {% set city =  '' %}
-                        {% for id,team in teams %}
-                        {% if city != team.city %}
+                        {% for team in teams %}
+                        {% if city != team.town %}
                         </optgroup>
-                        {% set city = team.city %}
+                        {% set city = team.town %}
                         <optgroup label="{{ city }}">
                             {% endif %}
-                            <option value="{{ id }}" {% if id == team1id %} selected{% endif %}>{{ team.name }}</option>
+                            <option value="{{ team.idteam }}" {% if team.idteam == team1id %} selected{% endif %}>{{ team.name }}</option>
                             {% endfor %}
                     </select>
                 </div>
@@ -37,13 +37,13 @@
                     <select id="team2ID" name="team2ID" class="form-control" onfocus="$('#team2IDcustom').val('')">
                         <option value="">--Выберите команду Германии--</option>
                         {% set city =  '' %}
-                        {% for id,team in teams %}
-                        {% if city != team.city %}
+                        {% for team in teams %}
+                        {% if city != team.town %}
                         </optgroup>
-                        {% set city = team.city %}
+                        {% set city = team.town %}
                         <optgroup label="{{ city }}">
                             {% endif %}
-                            <option value="{{ id }}" {% if id == team2id %} selected{% endif %}>{{ team.name }}</option>
+                            <option value="{{ team.idteam }}" {% if team.idteam == team2id %} selected{% endif %}>{{ team.name }}</option>
                             {% endfor %}
                     </select>
                 </div>

@@ -15,6 +15,9 @@ abstract class AbstractController
     const SECTION_F2F     = 'f2f';
     const SECTION_RESULTS = 'results';
 
+    const PARAM_TOWN      = 'town';
+    const PARAM_COUNTRY   = 'country';
+
     /**
      * @var \Pimple\Container
      */

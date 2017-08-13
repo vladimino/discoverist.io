@@ -2,8 +2,6 @@
 
 namespace Vladimino\Discoverist\Model;
 
-use Vladimino\Discoverist\Core\Config;
-use Vladimino\Discoverist\Error\LoadConfigException;
 use Vladimino\Discoverist\Error\TeamNotFoundException;
 use Vladimino\Discoverist\Rating\Connector;
 
@@ -14,11 +12,8 @@ use Vladimino\Discoverist\Rating\Connector;
  */
 class AbstractRatingAwareModel
 {
-    const KEY_PLACE   = 'place';
-    const KEY_POINTS  = 'questions_total';
-    const KEY_TEAM_ID = 'idteam';
-    const KEY_TOWN    = 'town';
-    const KEY_TOURS   = 'tournaments';
+    const COUNTRY_GERMANY       = 'Германия';
+    const TOWN_BERLIN           = 'Берлин';
 
     /**
      * @var Connector
@@ -43,34 +38,21 @@ class AbstractRatingAwareModel
     public function __construct(Connector $connector)
     {
         $this->connector = $connector;
-        $this->allTours  = \array_reverse(Config::get('tours'));
-        $this->allTeams  = Config::get('teams');
     }
 
     /**
+     * @param string $countryFilter
+     * @param string $townFilter
+     *
      * @return array
-     * @throws LoadConfigException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
-    public function getTours(): array
+    public function getFilteredTeams(string $countryFilter, string $townFilter = ''): array
     {
-        if (empty($this->allTours)) {
-            throw new LoadConfigException();
-        }
+        $filteredTowns = !empty($townFilter) ? [$townFilter] : $this->getTownsByCountry($countryFilter);
 
-        return $this->allTours;
-    }
-
-    /**
-     * @return array
-     * @throws \Vladimino\Discoverist\Error\LoadConfigException
-     */
-    public function getAllTeams(): array
-    {
-        if (empty($this->allTeams)) {
-            throw new LoadConfigException();
-        }
-
-        return $this->allTeams;
+        return $this->geAllTeamsForTowns($filteredTowns);
     }
 
     /**
@@ -90,5 +72,82 @@ class AbstractRatingAwareModel
         }
 
         return $team;
+    }
+
+    /**
+     * @param array $towns
+     *
+     * @return array
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    protected function geAllTeamsForTowns(array $towns): array
+    {
+        $teams = [];
+        foreach ($towns as $town) {
+            $teams = \array_merge($teams, $this->connector->searchTeamsByTown($town));
+        }
+
+        return $teams;
+    }
+
+    /**
+     * @param string $country
+     *
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function getTownsByCountry(string $country): array
+    {
+        return $this->connector->getTownsByCountry($country);
+    }
+
+    /**
+     * @param array $teams
+     *
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function getPlayedTournamentsIDsByTeams(array $teams): array
+    {
+        $tourIds = [];
+        foreach ($teams as $team) {
+            $teamWithTours = $this->connector->getToursByTeam($team[Connector::KEY_TEAM_ID]);
+            if ($teamWithTours[Connector::KEY_TOURS]) {
+                $tourIds = \array_merge($tourIds, $teamWithTours[Connector::KEY_TOURS]);
+            }
+        }
+
+        return \array_unique($tourIds);
+    }
+
+    /**
+     * @param array $tours
+     *
+     * @return array
+     */
+    protected function orderToursByDate(array $tours): array
+    {
+        $toursCollection = \collect($tours);
+
+        return $toursCollection
+            ->sortByDesc(Connector::KEY_DATE_START)
+            ->toArray();
+    }
+
+    /**
+     * @param array $tourIds
+     *
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function getToursInfoByTourIds(array $tourIds): array
+    {
+        $tours = [];
+        foreach ($tourIds as $tourId) {
+            $tours[] = $this->connector->getTourInfo($tourId);
+        }
+
+        return $tours;
     }
 }

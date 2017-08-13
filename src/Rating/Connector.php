@@ -19,13 +19,20 @@ class Connector
     const API_SUFFIX_TOURS  = '/tournaments';
 
     const API_PARAM_TOWN = 'town';
+    const API_FORMAT     = '.json';
 
-    const API_FORMAT      = '.json';
+    const KEY_TEAM_ID    = 'idteam';
+    const KEY_TOWN       = 'town';
+    const KEY_PLACE      = 'place';
+    const KEY_POINTS     = 'questions_total';
+    const KEY_TOURS      = 'tournaments';
+    const KEY_DATE_START = 'date_start';
+    const KEY_NAME       = 'name';
 
     private const COLUMN_INDEX_TOWN = 1;
 
-    private const AGENT  = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
-    private const COOKIE = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
+    private const AGENT         = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
+    private const COOKIE        = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
 
     /**
      * @var \Vladimino\Discoverist\Rating\Geo

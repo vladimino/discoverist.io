@@ -2,8 +2,8 @@
 
 namespace Vladimino\Discoverist\Model;
 
-use Vladimino\Discoverist\Error\LoadConfigException;
 use Vladimino\Discoverist\Error\SameTeamException;
+use Vladimino\Discoverist\Rating\Connector;
 
 /**
  * Class Face2FaceModel
@@ -20,22 +20,28 @@ class Face2FaceModel extends AbstractRatingAwareModel
     const RESULT_TEAM_2_WIN = 'team2win';
     const RESULT_DRAW       = 'draw';
 
+    const DEFAULT_TEAM1_ID = 3476; // Псевдопептиды
+    const DEFAULT_TEAM2_ID = 4649; // Берлитанты
+
     /**
      * @param int $team1ID
      * @param int $team2ID
      *
      * @return array
+     * @throws \RuntimeException
      * @throws \Exception
      * @throws SameTeamException
-     * @throws LoadConfigException
      */
     public function getResultsForTeams(int $team1ID, int $team2ID): array
     {
         $this->validateInput($team1ID, $team2ID);
 
-        $results = [];
-        foreach ($this->allTours as $tour) {
-            $resultForTour = $this->getTourResults($team1ID, $team2ID, $tour);
+        $teams          = $this->buildTeamArrayFromTeamIDs($team1ID, $team2ID);
+        $playedToursIDs = $this->getPlayedTournamentsIDsByTeams($teams);
+        $results        = [];
+
+        foreach ($playedToursIDs as $tourID) {
+            $resultForTour = $this->getTourResults($team1ID, $team2ID, $tourID);
             if (null !== $resultForTour) {
                 $results[] = $resultForTour;
             }
@@ -68,14 +74,15 @@ class Face2FaceModel extends AbstractRatingAwareModel
     /**
      * @param int $team1ID
      * @param int $team2ID
-     * @param array $tour
+     * @param int $tourID
      *
      * @return array
      * @throws \Exception
      */
-    public function getTourResults(int $team1ID, int $team2ID, array $tour): ?array
+    private function getTourResults(int $team1ID, int $team2ID, int $tourID): ?array
     {
-        $results         = $this->connector->getTourResults($tour['id']);
+        $tourInfo         = $this->connector->getTourInfo($tourID);
+        $results         = $this->connector->getTourResults($tourID);
         $filteredResults = $this->filterResults($results, $team1ID, $team2ID);
 
         if (\count($filteredResults) !== 2) {
@@ -86,19 +93,19 @@ class Face2FaceModel extends AbstractRatingAwareModel
         $team2Result = $this->filterResultsByTeam($filteredResults, $team2ID);
 
         if (!isset(
-            $team1Result[AbstractRatingAwareModel::KEY_POINTS],
-            $team2Result[AbstractRatingAwareModel::KEY_POINTS]
+            $team1Result[Connector::KEY_POINTS],
+            $team2Result[Connector::KEY_POINTS]
         )
         ) {
             return null;
         }
 
         return [
-            'result' => $this->processResultForTour($team1Result, $team2Result),
-            'tour_id' => $tour['id'],
-            'tour_name' => $tour['name'],
-            'team1points' => $team1Result[AbstractRatingAwareModel::KEY_POINTS],
-            'team2points' => $team2Result[AbstractRatingAwareModel::KEY_POINTS],
+            'result'      => $this->processResultForTour($team1Result, $team2Result),
+            'tour_id'     => $tourID,
+            'tour_name'   => $tourInfo[Connector::KEY_NAME],
+            'team1points' => $team1Result[Connector::KEY_POINTS],
+            'team2points' => $team2Result[Connector::KEY_POINTS],
         ];
     }
 
@@ -129,8 +136,8 @@ class Face2FaceModel extends AbstractRatingAwareModel
      */
     private function processResultForTour(array $team1Result, array $team2Result): string
     {
-        $team1Points = $team1Result[AbstractRatingAwareModel::KEY_POINTS];
-        $team2Points = $team2Result[AbstractRatingAwareModel::KEY_POINTS];
+        $team1Points = $team1Result[Connector::KEY_POINTS];
+        $team2Points = $team2Result[Connector::KEY_POINTS];
 
         if ($team1Points > $team2Points) {
             $this->team1Wins++;
@@ -171,7 +178,6 @@ class Face2FaceModel extends AbstractRatingAwareModel
      * @param int $team1ID
      * @param int $team2ID
      *
-     * @throws \Vladimino\Discoverist\Error\LoadConfigException
      * @throws \Vladimino\Discoverist\Error\SameTeamException
      */
     private function validateInput(int $team1ID, int $team2ID): void
@@ -179,9 +185,20 @@ class Face2FaceModel extends AbstractRatingAwareModel
         if ($team1ID === $team2ID) {
             throw new SameTeamException();
         }
+    }
 
-        if (empty($this->allTours)) {
-            throw new LoadConfigException();
+    /**
+     * @param int[] $teamIDs
+     *
+     * @return array
+     */
+    private function buildTeamArrayFromTeamIDs(...$teamIDs): array
+    {
+        $teams = [];
+        foreach ($teamIDs as $teamID) {
+            $teams[][Connector::KEY_TEAM_ID] = $teamID;
         }
+
+        return $teams;
     }
 }
