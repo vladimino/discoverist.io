@@ -78,9 +78,11 @@ class ResultsModel extends AbstractRatingAwareModel
         $tours        = $this->getToursInfoByTourIds($tourIds);
         $orderedTours = $this->orderToursByDate($tours);
 
-        while (\strtotime($orderedTours[0]['date_end']) > \time()) {
-            \array_shift($orderedTours);
-        }
+        do {
+            $lastTour = \array_shift($orderedTours);
+        } while (\strtotime($lastTour['date_end']) > \time());
+
+        \array_unshift($orderedTours, $lastTour);
 
         return $orderedTours;
     }
