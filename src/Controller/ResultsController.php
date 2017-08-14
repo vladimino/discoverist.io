@@ -5,6 +5,7 @@ namespace Vladimino\Discoverist\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Vladimino\Discoverist\Model\ResultsModel;
+use Vladimino\Discoverist\Rating\Connector;
 
 /**
  * Class ResultsController
@@ -28,15 +29,16 @@ class ResultsController extends AbstractController
     {
         $defaultTown = $request->get(self::PARAM_DEFAULT_TOWN, ResultsModel::TOWN_BERLIN);
         /** @var ResultsModel $model */
-        $model       = $this->container['model.results'];
-        $tours       = $model->getPlayedToursForTown($defaultTown);
+        $model     = $this->container['model.results'];
+        $tours     = $model->getPlayedToursForTown($defaultTown);
+        $toursColl = \collect($tours);
 
-        $currentTourId = $request->get(self::PARAM_TOUR, $tours[0]['idtournament'] ?? 0);
+        $currentTourId   = $request->get(self::PARAM_TOUR, $toursColl->first()[Connector::KEY_TOUR_ID] ?? 0);
+        $currentTourInfo = $model->getTourInfo($currentTourId);
+
         $countryFilter = $request->get(self::PARAM_COUNTRY, ResultsModel::COUNTRY_GERMANY);
         $townFilter    = $request->get(self::PARAM_TOWN, '');
-
-        $currentTourInfo = $model->getTourInfo($currentTourId);
-        $results         = $model->getFilteredResultsFromTournament($currentTourId, $countryFilter, $townFilter);
+        $results       = $model->getFilteredResultsFromTournament($currentTourId, $countryFilter, $townFilter);
 
         return $this->render(
             'results',

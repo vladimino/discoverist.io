@@ -22,12 +22,14 @@ class Connector
     const API_FORMAT     = '.json';
 
     const KEY_TEAM_ID    = 'idteam';
+    const KEY_TOUR_ID    = 'idtournament';
     const KEY_TOWN       = 'town';
     const KEY_PLACE      = 'place';
     const KEY_POINTS     = 'questions_total';
     const KEY_TOURS      = 'tournaments';
     const KEY_DATE_START = 'date_start';
     const KEY_NAME       = 'name';
+    const KEY_DATE_END   = 'date_end';
 
     private const COLUMN_INDEX_TOWN = 1;
 

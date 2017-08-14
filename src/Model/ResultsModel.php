@@ -78,13 +78,7 @@ class ResultsModel extends AbstractRatingAwareModel
         $tours        = $this->getToursInfoByTourIds($tourIds);
         $orderedTours = $this->orderToursByDate($tours);
 
-        do {
-            $lastTour = \array_shift($orderedTours);
-        } while (\strtotime($lastTour['date_end']) > \time());
-
-        \array_unshift($orderedTours, $lastTour);
-
-        return $orderedTours;
+        return $this->filterToursByDateEnd($orderedTours, \time());
     }
 
     /**
@@ -188,5 +182,21 @@ class ResultsModel extends AbstractRatingAwareModel
     private function populateTournamentResults(int $tournamentID): void
     {
         $this->tourResults = \collect($this->connector->getTourResults($tournamentID));
+    }
+
+    /**
+     * @param array $tours
+     * @param int $time
+     *
+     * @return array
+     */
+    private function filterToursByDateEnd(array $tours, int $time): array
+    {
+        return \collect($tours)
+            ->filter(
+                function ($tour) use ($time) {
+                    return \strtotime($tour[Connector::KEY_DATE_END]) < $time;
+                }
+            )->toArray();
     }
 }
