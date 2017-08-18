@@ -101,7 +101,6 @@ class Connector
      * @param int $teamId
      *
      * @return array
-     * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */

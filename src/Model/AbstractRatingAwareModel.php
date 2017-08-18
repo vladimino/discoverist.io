@@ -64,7 +64,6 @@ class AbstractRatingAwareModel
      * @return array
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Exception
      * @throws TeamNotFoundException
      */
     public function getTeamById(int $teamId): array

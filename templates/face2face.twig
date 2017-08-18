@@ -8,51 +8,87 @@
 {% block content %}
     <h4>Выберите немецкую команду из списка или введите ID любой команды</h4>
     <form class="form-inline">
-        <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <label class="sr-only" for="team1ID">1-я команда</label>
-                    <select id="team1ID" name="team1ID" class="form-control" onfocus="$('#team1IDcustom').val('')">
-                        <option value="">--Выберите команду Германии--</option>
-                        {% set city =  '' %}
-                        {% for team in teams %}
-                        {% if city != team.town %}
-                        </optgroup>
-                        {% set city = team.town %}
-                        <optgroup label="{{ city }}">
-                            {% endif %}
-                            <option value="{{ team.idteam }}" {% if team.idteam == team1id %} selected{% endif %}>{{ team.name }}</option>
-                            {% endfor %}
-                    </select>
-                </div>
+
+        <div class="row" style="padding: 5px 0">
+            <div class="col-md-1">
+                <label for="season">Сезон: </label>
+            </div>
+            <div class="col-md-11">
+                <select id="season" name="season" class="form-control"
+                        title="По этому сезону будут запрашиваться результаты">
+                    {% for season_id,season in allSeasons %}
+                        <option value="{{ season_id }}" {% if season_id == currentSeasonId %} selected{% endif %}>{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="padding: 5px 0">
+            <div class="col-md-1">
+                <label for="defaultCountry">Страна: </label>
+            </div>
+            <div class="col-md-11">
+                <input id="defaultCountry" class="form-control" name="defaultCountry"
+                       title="По этой стране будет строиться готовый список команд"
+                       value="{{ defaultCountry }}">
+            </div>
+        </div>
+
+        <div class="row" style="padding: 5px 0">
+            <div class="col-md-1">
+                <label for="team1ID">1-я команда:</label>
+            </div>
+            <div class="col-md-2">
+                <select id="team1ID" name="team1ID" class="form-control" onfocus="$('#team1IDcustom').val('')">
+                    <option value="">--Выберите команду --</option>
+                    {% set city =  '' %}
+                    {% for team in teams %}
+                    {% if city != team.town %}
+                    </optgroup>
+                    {% set city = team.town %}
+                    <optgroup label="{{ city }}">
+                        {% endif %}
+                        <option value="{{ team.idteam }}" {% if team.idteam == team1id %} selected{% endif %}>{{ team.name }}</option>
+                        {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
                 <input id="team1IDcustom" name="team1IDcustom" type="number" class="form-control"
                        value="{{ customteam1id }}" placeholder="ID любой команды" onfocus="$('#team1ID').val('')">
             </div>
         </div>
-        <p class="form-control-static">vs.</p>
-        <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <label class="sr-only" for="team2ID">2-я команда</label>
-                    <select id="team2ID" name="team2ID" class="form-control" onfocus="$('#team2IDcustom').val('')">
-                        <option value="">--Выберите команду Германии--</option>
-                        {% set city =  '' %}
-                        {% for team in teams %}
-                        {% if city != team.town %}
-                        </optgroup>
-                        {% set city = team.town %}
-                        <optgroup label="{{ city }}">
-                            {% endif %}
-                            <option value="{{ team.idteam }}" {% if team.idteam == team2id %} selected{% endif %}>{{ team.name }}</option>
-                            {% endfor %}
-                    </select>
-                </div>
+
+        <div class="row" style="padding: 5px 0">
+            <div class="col-md-1">
+                <label for="team2ID">2-я команда:</label>
+            </div>
+            <div class="col-md-2">
+                <select id="team2ID" name="team2ID" class="form-control" onfocus="$('#team2IDcustom').val('')">
+                    <option value="">--Выберите команду --</option>
+                    {% set city =  '' %}
+                    {% for team in teams %}
+                    {% if city != team.town %}
+                    </optgroup>
+                    {% set city = team.town %}
+                    <optgroup label="{{ city }}">
+                        {% endif %}
+                        <option value="{{ team.idteam }}" {% if team.idteam == team2id %} selected{% endif %}>{{ team.name }}</option>
+                        {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 col-md-offset-1">
                 <input id="team2IDcustom" name="team2IDcustom" type="number" class="form-control"
                        value="{{ customteam2id }}" placeholder="ID любой команды" onfocus="$('#team2ID').val('')">
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Сравнить</button>
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <button type="submit" class="btn btn-primary">Сравнить</button>
+            </div>
+        </div>
     </form>
+
     <hr>
 
     {% if error_message %}
@@ -60,7 +96,8 @@
     {% else %}
         <div class="panel panel-default f2f-panel">
             <!-- Default panel contents -->
-            <div class="panel-heading">"{{ team1.name }}" ({{ team1.city }}) vs. "{{ team2.name }}" ({{ team2.city }})</div>
+            <div class="panel-heading">"{{ team1.name }}" ({{ team1.city }}) vs. "{{ team2.name }}" ({{ team2.city }})
+            </div>
             <div class="panel-body">
                 {% if fac2face %}
                 <h3>Соотношение побед и поражений</h3>

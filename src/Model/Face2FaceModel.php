@@ -26,18 +26,19 @@ class Face2FaceModel extends AbstractRatingAwareModel
     /**
      * @param int $team1ID
      * @param int $team2ID
+     * @param int $currentSeasonId
      *
      * @return array
      * @throws \RuntimeException
-     * @throws \Exception
-     * @throws SameTeamException
+     * @throws \InvalidArgumentException
+     * @throws \Vladimino\Discoverist\Error\SameTeamException
      */
-    public function getResultsForTeams(int $team1ID, int $team2ID): array
+    public function getResultsForTeams(int $team1ID, int $team2ID, int $currentSeasonId): array
     {
         $this->validateInput($team1ID, $team2ID);
 
         $teams          = $this->buildTeamArrayFromTeamIDs($team1ID, $team2ID);
-        $playedToursIDs = $this->getPlayedTournamentsIDsByTeams($teams, self::CURRENT_SEASON);
+        $playedToursIDs = $this->getPlayedTournamentsIDsByTeams($teams, $currentSeasonId);
         $results        = [];
 
         foreach ($playedToursIDs as $tourID) {
@@ -77,7 +78,8 @@ class Face2FaceModel extends AbstractRatingAwareModel
      * @param int $tourID
      *
      * @return array
-     * @throws \Exception
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function getTourResults(int $team1ID, int $team2ID, int $tourID): ?array
     {

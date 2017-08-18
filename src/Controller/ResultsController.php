@@ -14,11 +14,8 @@ use Vladimino\Discoverist\Rating\Connector;
  */
 class ResultsController extends AbstractController
 {
-    const PARAM_TOUR   = 'tournament';
-    const PARAM_SEASON = 'season';
-
-    const PARAM_DEFAULT_TOWN    = 'defaultTown';
-    const PARAM_DEFAULT_COUNTRY = 'defaultCountry';
+    const PARAM_TOUR         = 'tournament';
+    const PARAM_DEFAULT_TOWN = 'defaultTown';
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
