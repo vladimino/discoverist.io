@@ -36,7 +36,7 @@ class Connector
     private const AGENT         = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
     private const COOKIE        = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
 
-    private const CACHE_EXPIRATION = 86400; // 60 sec * 60 min * 24 h = 24 hours
+    private const CACHE_EXPIRATION = 3600; // 60 sec * 60 min = 1 hour
 
     /**
      * @var \Vladimino\Discoverist\Rating\Geo
@@ -122,14 +122,13 @@ class Connector
 
     /**
      * @param int $teamId
+     * @param int $seasonId
      *
      * @return array
-     * @throws \RuntimeException
      */
-    public function getToursByTeam(int $teamId): array
+    public function getToursByTeam(int $teamId, int $seasonId): array
     {
-        $seasonId = '/last';
-        $url = self::API_ENDPOINT_TEAMS . $teamId . self::API_SUFFIX_TOURS . $seasonId . self::API_FORMAT;
+        $url = self::API_ENDPOINT_TEAMS . $teamId . self::API_SUFFIX_TOURS . '/' . $seasonId . self::API_FORMAT;
 
         return $this->makeRequest($url);
     }

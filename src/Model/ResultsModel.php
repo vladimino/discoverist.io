@@ -66,15 +66,16 @@ class ResultsModel extends AbstractRatingAwareModel
 
     /**
      * @param string $town
+     * @param int $seasonId
      *
      * @return array
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    public function getPlayedToursForTown(string $town): array
+    public function getPlayedToursForTown(string $town, int $seasonId): array
     {
         $teams        = $this->geAllTeamsForTowns([$town]);
-        $tourIds      = $this->getPlayedTournamentsIDsByTeams($teams);
+        $tourIds      = $this->getPlayedTournamentsIDsByTeams($teams, $seasonId);
         $tours        = $this->getToursInfoByTourIds($tourIds);
         $orderedTours = $this->orderToursByDate($tours);
 

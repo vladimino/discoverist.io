@@ -6,6 +6,7 @@ use Pimple\Container;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
@@ -76,7 +77,7 @@ class App
         $request->attributes->add($matcher->match($request->getPathInfo()));
         $controller       = $request->attributes->get('_controller');
         $action           = $request->attributes->get('action');
-        $controllerObject = new $controller($this->container);
+        $controllerObject = new $controller($this->container, new Session());
 
         return $controllerObject->$action($request);
     }

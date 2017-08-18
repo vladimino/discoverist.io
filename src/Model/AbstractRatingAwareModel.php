@@ -2,6 +2,7 @@
 
 namespace Vladimino\Discoverist\Model;
 
+use Vladimino\Discoverist\Core\Config;
 use Vladimino\Discoverist\Error\TeamNotFoundException;
 use Vladimino\Discoverist\Rating\Connector;
 
@@ -12,8 +13,9 @@ use Vladimino\Discoverist\Rating\Connector;
  */
 class AbstractRatingAwareModel
 {
-    const COUNTRY_GERMANY       = 'Германия';
-    const TOWN_BERLIN           = 'Берлин';
+    const COUNTRY_GERMANY = 'Германия';
+    const TOWN_BERLIN     = 'Берлин';
+    const CURRENT_SEASON  = 50;
 
     /**
      * @var Connector
@@ -23,7 +25,7 @@ class AbstractRatingAwareModel
     /**
      * @var array
      */
-    protected $allTours;
+    protected $allSeasons;
 
     /**
      * @var array
@@ -37,7 +39,8 @@ class AbstractRatingAwareModel
      */
     public function __construct(Connector $connector)
     {
-        $this->connector = $connector;
+        $this->connector  = $connector;
+        $this->allSeasons = Config::get('seasons');
     }
 
     /**
@@ -75,6 +78,14 @@ class AbstractRatingAwareModel
     }
 
     /**
+     * @return array
+     */
+    public function getAllSeasons(): array
+    {
+        return $this->allSeasons;
+    }
+
+    /**
      * @param array $towns
      *
      * @return array
@@ -104,15 +115,15 @@ class AbstractRatingAwareModel
 
     /**
      * @param array $teams
+     * @param int $seasonId
      *
      * @return array
-     * @throws \RuntimeException
      */
-    protected function getPlayedTournamentsIDsByTeams(array $teams): array
+    protected function getPlayedTournamentsIDsByTeams(array $teams, int $seasonId): array
     {
         $tourIds = [];
         foreach ($teams as $team) {
-            $teamWithTours = $this->connector->getToursByTeam($team[Connector::KEY_TEAM_ID]);
+            $teamWithTours = $this->connector->getToursByTeam($team[Connector::KEY_TEAM_ID], $seasonId);
             if ($teamWithTours[Connector::KEY_TOURS]) {
                 $tourIds = \array_merge($tourIds, $teamWithTours[Connector::KEY_TOURS]);
             }

@@ -37,7 +37,7 @@ class Face2FaceModel extends AbstractRatingAwareModel
         $this->validateInput($team1ID, $team2ID);
 
         $teams          = $this->buildTeamArrayFromTeamIDs($team1ID, $team2ID);
-        $playedToursIDs = $this->getPlayedTournamentsIDsByTeams($teams);
+        $playedToursIDs = $this->getPlayedTournamentsIDsByTeams($teams, self::CURRENT_SEASON);
         $results        = [];
 
         foreach ($playedToursIDs as $tourID) {

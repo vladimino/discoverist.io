@@ -5,6 +5,7 @@ namespace Vladimino\Discoverist\Controller;
 use Pimple\Container;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Vladimino\Discoverist\View\Template;
 
 /**
@@ -24,13 +25,20 @@ abstract class AbstractController
     public $container;
 
     /**
+     * @var \Symfony\Component\HttpFoundation\Session\Session
+     */
+    protected $session;
+
+    /**
      * BaseController constructor.
      *
      * @param \Pimple\Container $container
+     * @param \Symfony\Component\HttpFoundation\Session\Session $session
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, Session $session)
     {
         $this->container = $container;
+        $this->session   = $session;
     }
 
     /**
