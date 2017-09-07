@@ -124,6 +124,7 @@ class Connector
      * @param int $seasonId
      *
      * @return array
+     * @throws \RuntimeException
      */
     public function getToursByTeam(int $teamId, int $seasonId): array
     {

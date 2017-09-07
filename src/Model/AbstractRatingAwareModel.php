@@ -15,7 +15,7 @@ class AbstractRatingAwareModel
 {
     const COUNTRY_GERMANY = 'Германия';
     const TOWN_BERLIN     = 'Берлин';
-    const CURRENT_SEASON  = 50;
+    const CURRENT_SEASON  = 51;
 
     /**
      * @var Connector
