@@ -33,8 +33,9 @@ class Connector
 
     private const COLUMN_INDEX_TOWN = 1;
 
-    private const AGENT         = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
-    private const COOKIE        = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
+    private const AGENT  = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36'
+                           . ' (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36';
+    private const COOKIE = 'chgk_last_seen_news=2016-08-21+19%3A16%3A13';
 
     private const CACHE_EXPIRATION = 3600; // 60 sec * 60 min = 1 hour
 
@@ -57,7 +58,7 @@ class Connector
     public function __construct(Geo $geoClient, \Memcached $cache)
     {
         $this->geoClient = $geoClient;
-        $this->cache = $cache;
+        $this->cache     = $cache;
     }
 
     /**
@@ -68,7 +69,7 @@ class Connector
      */
     public function getTourInfo($tourId): array
     {
-        $url            = self::API_ENDPOINT_TOURNAMENTS . $tourId .  self::API_FORMAT;
+        $url            = self::API_ENDPOINT_TOURNAMENTS . $tourId . self::API_FORMAT;
         $tournamentInfo = $this->makeRequest($url);
 
         if (!isset($tournamentInfo[0])) {
@@ -115,7 +116,7 @@ class Connector
 
         return [
             'name' => $teamInfo[0]['name'],
-            'city' => $teamInfo[0]['town']
+            'city' => $teamInfo[0]['town'],
         ];
     }
 
@@ -142,9 +143,9 @@ class Connector
      */
     public function searchTeamsByTown($town): array
     {
-        $url      = self::API_ENDPOINT_TEAMS . self::API_SUFFIX_SEARCH . self::API_FORMAT
-            . '?' . self::API_PARAM_TOWN . '=' . $town;
-        $teams    = $this->makeRequest($url);
+        $url   = self::API_ENDPOINT_TEAMS . self::API_SUFFIX_SEARCH . self::API_FORMAT
+                 . '?' . self::API_PARAM_TOWN . '=' . $town;
+        $teams = $this->makeRequest($url);
 
         return $teams['items'] ?? [];
     }
@@ -198,10 +199,10 @@ class Connector
             $resource,
             [
                 \CURLOPT_RETURNTRANSFER => true,
-                \CURLOPT_HEADER => 0,
+                \CURLOPT_HEADER         => 0,
                 \CURLOPT_RETURNTRANSFER => 1,
-                \CURLOPT_USERAGENT => self::AGENT,
-                \CURLOPT_COOKIE => self::COOKIE,
+                \CURLOPT_USERAGENT      => self::AGENT,
+                \CURLOPT_COOKIE         => self::COOKIE,
             ]
         );
 

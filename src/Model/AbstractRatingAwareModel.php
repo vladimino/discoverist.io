@@ -117,6 +117,7 @@ class AbstractRatingAwareModel
      * @param int $seasonId
      *
      * @return array
+     * @throws \RuntimeException
      */
     protected function getPlayedTournamentsIDsByTeams(array $teams, int $seasonId): array
     {
