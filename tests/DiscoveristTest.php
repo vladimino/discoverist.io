@@ -2,6 +2,7 @@
 
 namespace Vladimino\Discoverist\Tests;
 
+use Pimple\Container;
 use Vladimino\Discoverist\App;
 
 /**
@@ -15,7 +16,8 @@ class DiscoveristTest extends \PHPUnit_Framework_TestCase
      */
     public function testExample()
     {
-        $app = new App();
+        $container = $this->prophesize(Container::class);
+        $app       = new App($container->reveal());
         $this->assertTrue(true);
     }
 }
