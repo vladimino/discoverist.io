@@ -20,8 +20,8 @@ class Face2FaceModel extends AbstractRatingAwareModel
     const RESULT_TEAM_2_WIN = 'team2win';
     const RESULT_DRAW       = 'draw';
 
-    const DEFAULT_TEAM1_ID = 3476; // Псевдопептиды
-    const DEFAULT_TEAM2_ID = 4649; // Берлитанты
+    const DEFAULT_TEAM1_ID = 50000; // Алые Паруса
+    const DEFAULT_TEAM2_ID = 58865; // Cherchez la Panda
 
     /**
      * @param int $team1ID
