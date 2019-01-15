@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.1",
         "twbs/bootstrap": "~3.3",
         "paquettg/php-html-parser": "^1.7",
         "symfony/routing": "^4.2",
