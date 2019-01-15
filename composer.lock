@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "891b4e3d88931008f260c900c57c0fbe",
+    "content-hash": "5e3d39d1cc1e3a7e480a3f710cf0c03a",
     "packages": [
         {
             "name": "paquettg/php-html-parser",
