@@ -26,6 +26,7 @@
         <exec executable="${bin}/var-dump-check" passthru="true" checkreturn="true">
             <arg value="--ladybug"/>
             <arg value="--no-colors"/>
+            <arg value="${src}" />
             <arg value="${test}" />
         </exec>
     </target>
@@ -35,7 +36,7 @@
             <arg value="fix"/>
             <arg value="-v"/>
             <arg value="--dry-run"/>
-            <arg value="src"/>
+            <arg value="${src}"/>
         </exec>
     </target>
 
@@ -56,7 +57,7 @@
             <arg value="analyse" />
             <arg value="-n" />
             <arg value="--no-progress" />
-            <arg value="src" />
+            <arg value="${src}" />
         </exec>
     </target>
 

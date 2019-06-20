@@ -65,7 +65,7 @@
         ],
         "composer-validate" : "@composer validate --no-check-all --strict",
         "lint" : "parallel-lint src tests",
-        "var-dump-checker" : "var-dump-check --ladybug --no-colors src",
+        "var-dump-checker" : "var-dump-check --ladybug --no-colors src test",
         "cs" : "php-cs-fixer fix -v --dry-run src",
         "cs-fix" : "php-cs-fixer fix -v src",
         "psalm" : "psalm",
