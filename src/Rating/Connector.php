@@ -3,6 +3,8 @@
 namespace Vladimino\Discoverist\Rating;
 
 use KubAT\PhpSimple\HtmlDomParser;
+use simple_html_dom\simple_html_dom;
+use simple_html_dom\simple_html_dom_node;
 use Vladimino\Discoverist\Cache\CacheInterface;
 use Vladimino\Discoverist\Domain\Team;
 
@@ -117,18 +119,21 @@ class Connector
     {
         $url = $this->geoClient->getTownsByCountryUrl($country);
         $html = $this->makeRequest($url);
+        /** @var simple_html_dom $dom */
         $dom = HtmlDomParser::str_get_html($html);
         $towns = [];
 
+        /** @var simple_html_dom_node $row */
         foreach ($dom->find('.colored_table tr') as $row) {
             $index = 0;
+            /** @var simple_html_dom_node $column */
             foreach ($row->find('td') as $column) {
                 if ($index !== self::COLUMN_INDEX_TOWN) {
                     $index++;
                     continue;
                 }
 
-                $towns[] = \trim($column->plaintext);
+                $towns[] = \trim($column->text());
                 break;
             }
         }
