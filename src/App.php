@@ -12,33 +12,17 @@ use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
-/**
- * Class App
- *
- * @package Vladimino\Discoverist
- */
 class App
 {
-    /**
-     * @var \Pimple\Container
-     */
     private $container;
+    private $configDir;
 
-    /**
-     * App constructor.
-     *
-     * @param \Pimple\Container $container
-     */
-    public function __construct(Container $container)
+    public function __construct(Container $container, string $configDir)
     {
         $this->container = $container;
+        $this->configDir = $configDir;
     }
 
-    /**
-     * Runs an engine
-     *
-     * @throws \InvalidArgumentException When the HTTP status code is not valid
-     */
     public function run(): void
     {
         try {
@@ -59,14 +43,13 @@ class App
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     * @throws \Symfony\Component\Routing\Exception\MethodNotAllowedException
+     * @psalm-suppress MixedInferredReturnType
+     * @psalm-suppress MixedReturnStatement
+     * @psalm-suppress MixedMethodCall
      */
     private function retrieveResponse(): Response
     {
-        $locator = new FileLocator(\CONFIG_DIR);
+        $locator = new FileLocator($this->configDir);
         $loader  = new YamlFileLoader($locator);
         $routes  = $loader->load('routes.yml');
 
@@ -76,7 +59,7 @@ class App
         $matcher = new UrlMatcher($routes, $context);
         $request->attributes->add($matcher->match($request->getPathInfo()));
         $controller       = $request->attributes->get('_controller');
-        $action           = $request->attributes->get('action');
+        $action           = $request->attributes->get('action', 'indexAction');
         $controllerObject = new $controller($this->container, new Session());
 
         return $controllerObject->$action($request);

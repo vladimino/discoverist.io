@@ -6,16 +6,11 @@ use Vladimino\Discoverist\Core\Config;
 use Vladimino\Discoverist\Error\TeamNotFoundException;
 use Vladimino\Discoverist\Rating\Connector;
 
-/**
- * Class AbstractRatingAwareModel
- *
- * @package Vladimino\Discoverist\Model
- */
 class AbstractRatingAwareModel
 {
-    const COUNTRY_GERMANY = 'Германия';
-    const TOWN_BERLIN     = 'Берлин';
-    const CURRENT_SEASON  = 51;
+    public const COUNTRY_GERMANY = 'Германия';
+    public const TOWN_BERLIN     = 'Берлин';
+    public const CURRENT_SEASON  = 52;
 
     /**
      * @var Connector
@@ -27,30 +22,12 @@ class AbstractRatingAwareModel
      */
     protected $allSeasons;
 
-    /**
-     * @var array
-     */
-    protected $allTeams;
-
-    /**
-     * ResultsModel constructor.
-     *
-     * @param Connector $connector
-     */
     public function __construct(Connector $connector)
     {
         $this->connector  = $connector;
         $this->allSeasons = Config::get('seasons');
     }
 
-    /**
-     * @param string $countryFilter
-     * @param string $townFilter
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     */
     public function getFilteredTeams(string $countryFilter, string $townFilter = ''): array
     {
         $filteredTowns = !empty($townFilter) ? [$townFilter] : $this->getTownsByCountry($countryFilter);
@@ -58,39 +35,21 @@ class AbstractRatingAwareModel
         return $this->geAllTeamsForTowns($filteredTowns);
     }
 
-    /**
-     * @param int $teamId
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws TeamNotFoundException
-     */
     public function getTeamById(int $teamId): array
     {
-        $team = $this->allTeams[$teamId] ?? $this->connector->getTeamInfo($teamId);
+        $team = $this->connector->getTeamInfo($teamId);
         if (empty($team)) {
             throw new TeamNotFoundException($teamId);
         }
 
-        return $team;
+        return (array)$team;
     }
 
-    /**
-     * @return array
-     */
     public function getAllSeasons(): array
     {
         return $this->allSeasons;
     }
 
-    /**
-     * @param array $towns
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     */
     protected function geAllTeamsForTowns(array $towns): array
     {
         $teams = [];
@@ -101,30 +60,18 @@ class AbstractRatingAwareModel
         return $teams;
     }
 
-    /**
-     * @param string $country
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
     protected function getTownsByCountry(string $country): array
     {
         return $this->connector->getTownsByCountry($country);
     }
 
-    /**
-     * @param array $teams
-     * @param int $seasonId
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
     protected function getPlayedTournamentsIDsByTeams(array $teams, int $seasonId): array
     {
         $tourIds = [];
         foreach ($teams as $team) {
             $teamWithTours = $this->connector->getToursByTeam($team[Connector::KEY_TEAM_ID], $seasonId);
-            if ($teamWithTours[Connector::KEY_TOURS]) {
+
+            if (isset($teamWithTours[Connector::KEY_TOURS])) {
                 $tourIds = \array_merge($tourIds, $teamWithTours[Connector::KEY_TOURS]);
             }
         }
@@ -132,11 +79,6 @@ class AbstractRatingAwareModel
         return \array_unique($tourIds);
     }
 
-    /**
-     * @param array $tours
-     *
-     * @return array
-     */
     protected function orderToursByDate(array $tours): array
     {
         $toursCollection = \collect($tours);
@@ -146,12 +88,6 @@ class AbstractRatingAwareModel
             ->toArray();
     }
 
-    /**
-     * @param array $tourIds
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
     protected function getToursInfoByTourIds(array $tourIds): array
     {
         $tours = [];
@@ -159,16 +95,9 @@ class AbstractRatingAwareModel
             $tours[] = $this->connector->getTourInfo($tourId);
         }
 
-        return $tours;
+        return array_filter($tours);
     }
 
-    /**
-     * @param string $town
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     */
     protected function getTeamsForTown(string $town): array
     {
         $teams = \collect($this->connector->searchTeamsByTown($town));

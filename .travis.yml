@@ -1,13 +1,16 @@
 language: php
-
 php:
-  - hhvm
-  - 5.6
-  - 7
-
+- 7.3
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction
-
+- travis_retry composer self-update
+- travis_retry composer install --prefer-source --no-interaction
+cache:
+  directories:
+  - "$HOME/.composer/cache"
 script:
-  - composer test
+- "./vendor/bin/phing"
+deploy:
+  provider: heroku
+  api_key:
+    secure: REi62SV1OW8654HARYoL/s8ELYH1rvyZOLAZbecC+K+7DKJA3UNmhXzcDV9gev0kqAXvVly3BAor/CWYmJ0pcUMHpW9P0f+wof9tQngw0hFRKnQWMm3UYxrGhZdQgsFB6eIp69X9jna9q5VKOBKSeqjxRfQidxfz29ofJjVcjFkwpHyyqmvN2OCbWUQ2pi8TOJFx9tJvgLIhIZ1pPyE/6Er+co4pNU+tUDZNUhTFiC5Cg7OrJv2d1CjBoWKoGZ7i2usgF3VbUlnvsUqa+BKXP7nAI1QkHNPI8Lvsvqw1MFxTfE62Bm5BxIKElG49Eb/Sf82nXVbF3kGKUK2iUw8n6+87GG/OpEY63SqRAseZSnn8MzjtZGE2N/H3mZpm6bVHuCZ+QWDMAcqOn1aDt6lLJSr0i46JcvZE4rwPHeeT0+CtTBi/Qrr3XSdIVl85/gX2ZoZqb1bWrKeox+XxqbaD5ZmEdmHmEJLQUzlk3KOexdappKZRqw0Rvzlu3Z2P9vM+TOsL5VbsAPMaAjZpzicNm/W5nl7y+ENL8BXraqMBdm9m/ofpwwDlyA8QMOMgrlpAS4MeAuUb6MX8f2hCUsVhN+8nI+mZ2AY/wH43ARs86jvz90ipN73rXDj5wcppx43rv5scxX89JIe2to8V3w05bLGRpA2+MYIXKT+MS4UVQDk=
+  run: "composer publish:assets"

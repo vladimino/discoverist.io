@@ -2,30 +2,24 @@
 
 namespace Vladimino\Discoverist\Core;
 
-/**
- * Class Config loads and registers configuration files.
- */
 class Config
 {
     /** @todo yaml */
-    const CONFIG_EXTENSION = '.php';
+    public const CONFIG_EXTENSION = '.php';
+    public const CONFIG_PATH = __DIR__.'/../../config/';
 
     /** @var array */
     public static $configRegistry = [];
 
-    /**
-     * @param string $configName
-     *
-     * @return array
-     */
     public static function get(string $configName): array
     {
         $configName = \strtolower($configName);
+        $configPath = self::CONFIG_PATH.$configName.self::CONFIG_EXTENSION;
 
         /** @todo use proper config load */
-        /** @noinspection PhpIncludeInspection */
-        self::$configRegistry[$configName] = require \CONFIG_DIR . $configName . self::CONFIG_EXTENSION;
+        /** @psalm-suppress UnresolvableInclude */
+        self::$configRegistry[$configName] = require $configPath;
 
-        return self::$configRegistry[$configName];
+        return (array)self::$configRegistry[$configName];
     }
 }

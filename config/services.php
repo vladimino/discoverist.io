@@ -1,6 +1,7 @@
 <?php
 
 use Pimple\Container;
+use Vladimino\Discoverist\Cache\SimpleCache;
 use Vladimino\Discoverist\Model\Face2FaceModel;
 use Vladimino\Discoverist\Model\ResultsModel;
 use Vladimino\Discoverist\Rating\Connector;
@@ -8,10 +9,10 @@ use Vladimino\Discoverist\Rating\Geo;
 
 //Core
 $container['core.cache'] = function () {
-    $memcached = new \Memcached;
-    $memcached->addServer('/home/vladimin/.system/memcache/socket', 0);
+    $cache = new SimpleCache;
+    $cache->addServer(ROOT_DIR.'/var/cache/responses/');
 
-    return $memcached;
+    return $cache;
 };
 
 // Rating

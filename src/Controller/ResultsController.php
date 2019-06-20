@@ -7,24 +7,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Vladimino\Discoverist\Model\ResultsModel;
 use Vladimino\Discoverist\Rating\Connector;
 
-/**
- * Class ResultsController
- *
- * @package Vladimino\Discoverist\Controller
- */
 class ResultsController extends AbstractController
 {
-    const PARAM_TOUR         = 'tournament';
-    const PARAM_DEFAULT_TOWN = 'defaultTown';
+    private const PARAM_TOUR         = 'tournament';
+    private const PARAM_DEFAULT_TOWN = 'defaultTown';
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     */
     public function indexAction(Request $request): Response
     {
         $defaultTown = $request->get(

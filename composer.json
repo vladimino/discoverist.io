@@ -1,5 +1,6 @@
 {
     "name": "vladimino/discoverist.io",
+    "type": "project",
     "description": "Скрипты для ЧГК",
     "license": "MIT",
     "authors": [
@@ -8,8 +9,11 @@
             "email": "vladimino@gmail.com"
         }
     ],
+    "config": {
+        "sort-packages": true
+    },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.3",
         "twbs/bootstrap": "~3.3",
         "paquettg/php-html-parser": "^1.7",
         "symfony/routing": "^4.0",
@@ -19,11 +23,19 @@
         "sunra/php-simple-html-dom-parser": "^1.5",
         "tightenco/collect": "^5.4",
         "pimple/pimple": "^3.2",
-        "symfony/yaml": "^4.2"
+        "symfony/yaml": "^4.2",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
-        "phpspec/prophecy": "^1.8"
+        "phpspec/prophecy": "^1.8",
+        "jakub-onderka/php-parallel-lint": "~0.9",
+        "jakub-onderka/php-var-dump-check": "~0.2",
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "phing/phing": "^2.16",
+        "phpstan/phpstan": "^0.11.8",
+        "vimeo/psalm": "^3.4"
     },
     "autoload": {
         "psr-4": {
@@ -41,6 +53,22 @@
         "publish:assets": [
             "mkdir -p www/bootstrap",
             "cp -R vendor/twbs/bootstrap/dist/* www/bootstrap/"
-        ]
+        ],
+        "ci" : [
+            "@composer-validate",
+            "@lint",
+            "@var-dump-checker",
+            "@cs",
+            "@psalm",
+            "@phpstan",
+            "@test"
+        ],
+        "composer-validate" : "@composer validate --no-check-all --strict",
+        "lint" : "parallel-lint src tests",
+        "var-dump-checker" : "var-dump-check --ladybug --no-colors src",
+        "cs" : "php-cs-fixer fix -v --dry-run src",
+        "cs-fix" : "php-cs-fixer fix -v src",
+        "psalm" : "psalm",
+        "phpstan" : "phpstan analyse -n --no-progress src"
     }
 }

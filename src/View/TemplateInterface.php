@@ -8,13 +8,6 @@ namespace Vladimino\Discoverist\View;
 interface TemplateInterface
 {
     /**
-     * @param array $params
-     *
-     * @return void
-     */
-    public function init(array $params): void;
-
-    /**
      * @param string $template
      * @param array $data
      *

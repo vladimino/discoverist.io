@@ -5,34 +5,28 @@ namespace Vladimino\Discoverist\Model;
 use Vladimino\Discoverist\Error\SameTeamException;
 use Vladimino\Discoverist\Rating\Connector;
 
-/**
- * Class Face2FaceModel
- *
- * @package Model
- */
 class Face2FaceModel extends AbstractRatingAwareModel
 {
-    protected $team1Wins = 0;
-    protected $team2Wins = 0;
-    protected $draws     = 0;
+    public const DEFAULT_TEAM1_ID = 68786; // Сцилла
+    public const DEFAULT_TEAM2_ID = 67678; // Котобусуер Тор
 
-    const RESULT_TEAM_1_WIN = 'team1win';
-    const RESULT_TEAM_2_WIN = 'team2win';
-    const RESULT_DRAW       = 'draw';
-
-    const DEFAULT_TEAM1_ID = 50000; // Алые Паруса
-    const DEFAULT_TEAM2_ID = 58865; // Cherchez la Panda
+    private const RESULT_TEAM_1_WIN = 'team1win';
+    private const RESULT_TEAM_2_WIN = 'team2win';
+    private const RESULT_DRAW       = 'draw';
 
     /**
-     * @param int $team1ID
-     * @param int $team2ID
-     * @param int $currentSeasonId
-     *
-     * @return array
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Vladimino\Discoverist\Error\SameTeamException
+     * @var int
      */
+    protected $team1Wins = 0;
+    /**
+     * @var int
+     */
+    protected $team2Wins = 0;
+    /**
+     * @var int
+     */
+    protected $draws     = 0;
+
     public function getResultsForTeams(int $team1ID, int $team2ID, int $currentSeasonId): array
     {
         $this->validateInput($team1ID, $team2ID);
@@ -51,9 +45,6 @@ class Face2FaceModel extends AbstractRatingAwareModel
         return $results;
     }
 
-    /**
-     * @return array
-     */
     public function getTotals(): array
     {
         return [
@@ -64,23 +55,11 @@ class Face2FaceModel extends AbstractRatingAwareModel
         ];
     }
 
-    /**
-     * @return int
-     */
     private function getTotalGamesCount(): int
     {
         return $this->team1Wins + $this->draws + $this->team2Wins;
     }
 
-    /**
-     * @param int $team1ID
-     * @param int $team2ID
-     * @param int $tourID
-     *
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     */
     private function getTourResults(int $team1ID, int $team2ID, int $tourID): ?array
     {
         $tourInfo         = $this->connector->getTourInfo($tourID);
@@ -111,13 +90,6 @@ class Face2FaceModel extends AbstractRatingAwareModel
         ];
     }
 
-    /**
-     * @param array $results
-     * @param int $team1ID
-     * @param int $team2ID
-     *
-     * @return array
-     */
     private function filterResults(array $results, int $team1ID, int $team2ID): array
     {
         return \array_filter(
@@ -130,12 +102,6 @@ class Face2FaceModel extends AbstractRatingAwareModel
         );
     }
 
-    /**
-     * @param array $team1Result
-     * @param array $team2Result
-     *
-     * @return string
-     */
     private function processResultForTour(array $team1Result, array $team2Result): string
     {
         $team1Points = $team1Result[Connector::KEY_POINTS];
@@ -158,12 +124,6 @@ class Face2FaceModel extends AbstractRatingAwareModel
         return self::RESULT_DRAW;
     }
 
-    /**
-     * @param array $results
-     * @param int $teamID
-     *
-     * @return array
-     */
     private function filterResultsByTeam(array $results, int $teamID): array
     {
         $filteredResults = \array_filter(
@@ -173,15 +133,9 @@ class Face2FaceModel extends AbstractRatingAwareModel
             }
         );
 
-        return \array_pop($filteredResults);
+        return (array)\array_pop($filteredResults);
     }
 
-    /**
-     * @param int $team1ID
-     * @param int $team2ID
-     *
-     * @throws \Vladimino\Discoverist\Error\SameTeamException
-     */
     private function validateInput(int $team1ID, int $team2ID): void
     {
         if ($team1ID === $team2ID) {
@@ -189,12 +143,7 @@ class Face2FaceModel extends AbstractRatingAwareModel
         }
     }
 
-    /**
-     * @param int[] $teamIDs
-     *
-     * @return array
-     */
-    private function buildTeamArrayFromTeamIDs(...$teamIDs): array
+    private function buildTeamArrayFromTeamIDs(int ...$teamIDs): array
     {
         $teams = [];
         foreach ($teamIDs as $teamID) {
