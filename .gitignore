@@ -1,6 +1,4 @@
 /vendor/
 /www/bootstrap/*
-!www/bootstrap/.gitkeep
 var/cache/*
-!var/cache/.gitkeep
 *.cache

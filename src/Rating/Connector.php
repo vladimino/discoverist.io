@@ -2,7 +2,7 @@
 
 namespace Vladimino\Discoverist\Rating;
 
-use Sunra\PhpSimple\HtmlDomParser;
+use KubAT\PhpSimple\HtmlDomParser;
 use Vladimino\Discoverist\Cache\CacheInterface;
 use Vladimino\Discoverist\Domain\Team;
 
