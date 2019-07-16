@@ -1,0 +1,16 @@
+engines:
+  phan:
+    enabled: true
+    checks:
+      PhanUndeclaredClassMethod:
+        enabled: false
+      PhanUndeclaredClassConstant:
+        enabled: false
+      PhanUndeclaredTypeParameter:
+        enabled: false
+      PhanUndeclaredFunction:
+        enabled: false
+      PhanUndeclaredTypeReturnType:
+        enabled: false
+      PhanUndeclaredTypeProperty:
+        enabled: false

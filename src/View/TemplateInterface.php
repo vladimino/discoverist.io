@@ -9,7 +9,7 @@ interface TemplateInterface
 {
     /**
      * @param string $template
-     * @param array $data
+     * @param array|null $data
      *
      * @return string
      */
